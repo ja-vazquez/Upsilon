@@ -7,9 +7,9 @@ Some of the improvements, compared to previous versions, are:
 * The computation of the non-linear power spectrum up to k~1 h/Mpc using the 
  	[Coyote emulator](http://www.hep.anl.gov/cosmology/CosmicEmu/emu.html). We may consider the [HMcode](https://github.com/alexander-mead/hmcode) later.
  
- * To compute correlation fuctions, and speed things up, we have incorporated the fast fourier transform ([FFTLog](http://casa.colorado.edu/~ajsh/FFTLog/#motivation)). 
+* To compute correlation fuctions, and speed things up, we have incorporated the fast fourier transform ([FFTLog](http://casa.colorado.edu/~ajsh/FFTLog/#motivation)). 
  
- * For each set of cosmological parameters, we are now able to compute Non-linear corrections to the real space correlation function, as in Figure 3 of [arxiv:0911.4973](http://arxiv.org/abs/0911.4973). 
+* For each set of cosmological parameters, we are now able to compute Non-linear corrections to the real space correlation function, as in Figure 3 of [arxiv:0911.4973](http://arxiv.org/abs/0911.4973). 
 
 ###Data
 Data files for mocks/simulations provided by Sukhdeep are located
