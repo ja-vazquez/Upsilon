@@ -20,7 +20,7 @@ in [Bitbucket](https://bitbucket.org/sukhdeep89/lowz_clustering_lensing).
 ``read_data.py`` is used to rezise the correlation function gg and gm, and
 the covariance matrix considering only values up to 70 Mpc (also eliminating the first point).
 
-``wq_run.py `` useful to place files in the queue of the clustes.
+``wq_run.py `` useful to place files in the queue of the bnl/astro cluster.
 This will produce .Ini files --for CosmoMC-- and wq scripts for the cluster.
 
 ``wq_run_plot.py``. Once you have the chains in place, run this file to
