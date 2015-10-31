@@ -28,4 +28,4 @@ get plots: posterior distributions, best fit values -with and without non-linear
 bias- and best-ft values for sigma8.
 
 
-![](https://github.com/ja-vazquez/Upsilon/sigma8.jpg)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/sigma8.jpg)
