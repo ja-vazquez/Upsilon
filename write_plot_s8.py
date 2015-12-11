@@ -2,22 +2,19 @@ import pylab
 import os, sys, time
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from Useful import *
 
         #lin or log, sim or mocks
 if len(sys.argv) > 2:
-    which ='%s'%(sys.argv[1])
-    whatt  =['%s'%(sys.argv[2])]
+    data_type ='%s'%(sys.argv[1])
+    bin_type  =['%s'%(sys.argv[2])]
     if len(sys.argv) > 3:
-      redzz = ['%s'%(sys.argv[3])]
-    else:
-      if 'sim' in which:
-         redzz = ['0.25','0.40']
-      elif 'mocks' in which:
-         redzz = ['steps_','']
+        redzz = ['%s'%(sys.argv[3])]
 else:
-     print 'select sim/mocks  lin1:log / bin:rebin1  [0.25,0.40]/[steps_,]'
+      print_message()
 
-whatt =['rebin1','lin1'] #,'lin_bin2','lin_rebin2']
+bin_type =['log1_rebin', 'log1']
+redzz = ['lowz', 'z1', 'z2']
 #-----------------------------
 
 dir = 'bestfit/'
@@ -26,8 +23,10 @@ colors = ['r', 'g','b','m']
 for redz in redzz:
     j=0
     R0t, s8t, sig1t, sig2t, sig3t, sig4t=[],[],[],[],[],[]
-    for what in whatt: 
-       file = dir + 'best_sigma8_%s_%s.dat'%(what,redz) 
+    
+    for bin_typ in bin_type:
+       filen  = files_name(data_type, bin_typ, redz)	 
+       file = dir + 'best_sigma8_%s.dat'%(filen) 
        s8_lines = open(file,'r').readlines()
 
        R0, s8, sig1, sig2, sig3, sig4 = [], [],[], [],[],[]
@@ -49,10 +48,11 @@ for redz in redzz:
 
     fig =plt.figure(figsize=(15,6))
     ax = fig.add_subplot(1,1,1)
+   
     
-    for i in range(0,len(whatt)): 
-      ax.errorbar(R0t[i], s8t[i], yerr=[sig3t[i], sig4t[i]], fmt=None,   ecolor=colors[i], label=whatt[i])
-      ax.errorbar(R0t[i], s8t[i], yerr=[sig1t[i], sig2t[i]], fmt=None,  ecolor=colors[i])
+    for i in range(len(R0t)): 
+       ax.errorbar(R0t[i], s8t[i], yerr=[sig3t[i], sig4t[i]], fmt='o',   ecolor=colors[i], label=bin_type[i])
+       ax.errorbar(R0t[i], s8t[i], yerr=[sig1t[i], sig2t[i]], fmt='o',  ecolor=colors[i])
     #ax.grid(True)
     ax.get_xaxis().set_minor_locator(mpl.ticker.AutoMinorLocator())
     ax.get_yaxis().set_minor_locator(mpl.ticker.AutoMinorLocator())
@@ -64,5 +64,5 @@ for redz in redzz:
     plt.title('z = %s'%(redz))
     plt.legend(loc="upper right")
     plt.xlim(1,R0[-1]+2)
-    pylab.savefig(dir+"best_sigma8_%s_%s.pdf"%(what,redz))
+    pylab.savefig(dir+"best_sigma8_%s.pdf"%(filen))
 plt.show()

@@ -1,35 +1,28 @@
 import pylab 
 import os, sys, time
 import matplotlib.pyplot as plt
-
+from Useful import *
 
         #lin or log, sim or mocks
 if len(sys.argv) > 2:
-    which ='%s'%(sys.argv[1])
-    what  ='%s'%(sys.argv[2])
+    data_type ='%s'%(sys.argv[1])
+    bin_type  ='%s'%(sys.argv[2])
     if len(sys.argv) > 3:
-      redzz = ['%s'%(sys.argv[3])]
-    else:
-      if 'sim' in which:
-         redzz = ['0.25','0.40']
-      elif 'mocks' in which:
-         redzz = ['steps_','']
+        redzz = ['%s'%(sys.argv[3])]
 else:
-    print 'select sim/mocks  lin1:log / bin:rebin1  [0.25,0.40]/[steps_,]'
-
+      print_message()
 #-----------------------------
 
-lnum = 2, 3, 4, 5, 6, 10, 20
-
+lnum =  R0_files()
+filen  = files_name(data_type, bin_type, redz)
 
 for redz in redzz:
-  for n in range(0,len(lnum)):
-
-    R0 = lnum[n]
-
+  for _, num in enumerate(lnum):
+    file_num_extra = '%s%i%s'%(file, num, extra())
+    
     dir = 'bestfit/'
-    file = dir + 'best_%s_fit_z%s_R0%i'%(what,redz,R0)
-    file2 = dir + 'best_%s_fit_z%s_R0%i_b20'%(what,redz,R0)
+    file = dir + 'best_%s'%(file_num_extra)
+    file2 = dir + 'best_%s_b20'%(file_num_extra)
 
     pnames=open(file + '.dat').readlines()
     pnames2=open(file2 + '.dat').readlines()
@@ -69,21 +62,23 @@ for redz in redzz:
     ax = fig.add_subplot(1,2,1)
 
     ax.errorbar(gg_R, gg, yerr=gg_error,  fmt='+')
-    ax.plot(gg_R, gg_fit, label = 'best_%s_fit'%(what))
-    ax.plot(gg_b20_R, gg_b20_fit, label = 'best_%s_fit, b2=0'%(what))
+    ax.plot(gg_R, gg_fit, label = 'best_%s'%(filen))
+    ax.plot(gg_b20_R, gg_b20_fit, label = 'best_%s, b2=0'%(filen))
     plt.xlabel('R')
     plt.ylabel('gg')
-    ax.set_title('z=%s, R0=%i'%(redz,R0))
+    ax.set_xscale('log')
+    ax.set_title('z=%s, R0=%i'%(redz,num))
     plt.legend(loc="upper right")
     plt.xlim(2,82) 
 
     ax2 = fig.add_subplot(1,2,2)
     ax2.errorbar(gm_R, gm, yerr=gm_error,  fmt='+')
-    ax2.plot(gm_R, gm_fit, label = 'best_%s_fit'%(what))
-    ax2.plot(gm_b20_R, gm_b20_fit, label = 'best_%s_fit, b2=0'%(what))
+    ax2.plot(gm_R, gm_fit, label = 'best_%s'%(filen))
+    ax2.plot(gm_b20_R, gm_b20_fit, label = 'best_%s, b2=0'%(filen))
     plt.xlabel('R')
     plt.ylabel('gm')
-    ax2.set_title('z=%s, R0=%i'%(redz,R0))
+    ax2.set_xscale('log')
+    ax2.set_title('z=%s, R0=%i'%(redz,num))
     plt.legend(loc="upper right")
     plt.xlim(2,82)
 

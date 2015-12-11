@@ -64,7 +64,7 @@ type(CSpline) :: PkSpl, PkABSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl
 real, parameter :: zdatafid = 0.23, maxrgg=100.0, maxrgm=100.0
 !be the actual redshift of simulations. 
 real, parameter :: finalcor =0.00
-integer, parameter :: MAXNP=150
+integer, parameter :: MAXNP=200
 real*8 :: pi_ = 4*ATAN(1d0)
 real*8, parameter :: alnkmin=log(1d-3), alnkmax=log(10d0), alnkmin2=log(1d-3), alnkmax2=log(10.0d0) 
 real :: bestchi2=1e30

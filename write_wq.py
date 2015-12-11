@@ -1,52 +1,41 @@
 # only select between lin or log
 import os, sys, time
-
+from Useful import *
 
         #lin or log, sim or mocks
 if len(sys.argv) > 2:
-    which ='%s'%(sys.argv[1])
-    what  ='%s'%(sys.argv[2])
+    data_type ='%s'%(sys.argv[1])
+    bin_type  ='%s'%(sys.argv[2])
     if len(sys.argv) > 3:
-      redzz = ['%s'%(sys.argv[3])]
-    else:
-      if 'sim' in which:
-         redzz = ['0.25','0.40']
-      elif 'mocks' in which:
-         redzz = ['steps_','']
+        redzz = ['%s'%(sys.argv[3])]
+    if len(sys.argv) > 4:
+        extra ='%s'%(sys.argv[4])
 else:
-     print 'select sim/mocks  lin1:log / bin:rebin1  [0.25,0.40]/[steps_,]'	
-
-dir_chains = 'chains/Mocks/'
+    print_message()
 
 #--------------------------
 
-lnum = 2, 3, 4, 5, 6, 10, 20
+#extra     = extra()
 
+lnum =  R0_files()
+dir_chains = chain_dir(data_type)
 
 for redz in redzz:
- if 'sim' in which:
-     file = which +'_'+ what + '_z'+redz+'_norsd_np0.001_nRT10_r0'
- elif 'mocks' in which:
-     file = which +'_RST_'+ redz + what + '_DM1_r0'
- else:
-     print 'error'
+    file  = files_name(data_type, bin_type, redz)
      
-#------------------------------
-
- for n in range(0,len(lnum)):
-  num = lnum[n]
-
-  wq_input = """
+    for _, num in enumerate(lnum): 
+	file_num_extra = '%s%i%s'%(file, num, extra)
+        wq_input = """
 mode: bycore
-N: 9
-threads: 3
+N: 1
+threads: 1
 hostfile: auto
-job_name: %s%i.ini
+job_name: %s
 command: |
      source ~/.bashrc;
-     OMP_NUM_THREADS=%%threads%% mpirun -hostfile %%hostfile%% ./cosmomc INI_%s%i.ini > %slogs/INI_%s%i.log 2>%slogs/INI_%s%i.err
-  """%(file, num, file, num, dir_chains, file, num, dir_chains, file, num)
+     OMP_NUM_THREADS=%%threads%% mpirun -hostfile %%hostfile%% ./cosmomc INI_%s.ini > %slogs/INI_%s.log 2>%slogs/INI_%s.err
+        """%(file_num_extra, file_num_extra, dir_chains, file_num_extra, dir_chains, file_num_extra)
 
-  with open('wq_%s%i.ini'%(file, num), 'w') as f:
-       f.write(wq_input)
+        with open('wq_%s.ini'%(file_num_extra), 'w') as f:
+            f.write(wq_input)
 
