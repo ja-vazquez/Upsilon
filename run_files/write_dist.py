@@ -20,7 +20,6 @@ name_root = '_ups'
 
 chain_dir = chain_dir(data_type)
 lnum      = R0_files()
-extra     = extra()
  
 	# Don't change this line unless modify disparams
 txt='file_root=chains/Sim_rmin_gt_R0/Rmin_70_sim_z0.25_norsd_np0.001_nRT10_r02_ups'
@@ -28,7 +27,7 @@ txt='file_root=chains/Sim_rmin_gt_R0/Rmin_70_sim_z0.25_norsd_np0.001_nRT10_r02_u
 for redz in redzz:
    for _, num in enumerate(lnum): 
       file    = files_name(data_type, bin_type, redz)
-      file_num_extra = '%s%i%s'%(file, num, extra)
+      file_num_extra = '%s%i'%(file, num)
  
       txt_new = 'file_root=' + chain_dir  + file_num_extra + name_root
 

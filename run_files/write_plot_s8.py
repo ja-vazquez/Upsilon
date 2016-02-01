@@ -13,8 +13,8 @@ if len(sys.argv) > 2:
 else:
       print_message()
 
-bin_type =['log1_rebin', 'log1']
-redzz = ['lowz', 'z1', 'z2']
+#bin_type =['log1_rebin', 'log1']
+#redzz = ['lowz', 'z1', 'z2']
 #-----------------------------
 
 dir = 'bestfit/'
@@ -51,8 +51,8 @@ for redz in redzz:
    
     
     for i in range(len(R0t)): 
-       ax.errorbar(R0t[i], s8t[i], yerr=[sig3t[i], sig4t[i]], fmt='o',   ecolor=colors[i], label=bin_type[i])
-       ax.errorbar(R0t[i], s8t[i], yerr=[sig1t[i], sig2t[i]], fmt='o',  ecolor=colors[i])
+       ax.errorbar(R0t[i], s8t[i], yerr=[sig3t[i], sig4t[i]], fmt ='o',  ecolor=colors[i], label=bin_type[i])
+       ax.errorbar(R0t[i], s8t[i], yerr=[sig1t[i], sig2t[i]], fmt ='o', ecolor=colors[i])
     #ax.grid(True)
     ax.get_xaxis().set_minor_locator(mpl.ticker.AutoMinorLocator())
     ax.get_yaxis().set_minor_locator(mpl.ticker.AutoMinorLocator())

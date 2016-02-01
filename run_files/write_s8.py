@@ -17,7 +17,7 @@ lnum =  R0_files()
 for redz in redzz:
   file  = files_name(data_type, bin_type, redz)
   for _, num in enumerate(lnum):
-   file_num_extra = '%s%i%s'%(file, num, extra())
+   file_num_extra = '%s%i'%(file, num)
         # read best fit values
    file_bf = 'stats/' + file_num_extra + '_ups.margestats'
 

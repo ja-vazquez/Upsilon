@@ -18,7 +18,7 @@ filen  = files_name(data_type, bin_type, redz)
 
 for redz in redzz:
   for _, num in enumerate(lnum):
-    file_num_extra = '%s%i%s'%(file, num, extra())
+    file_num_extra = '%s%i'%(file, num)
     
     dir = 'bestfit/'
     file = dir + 'best_%s'%(file_num_extra)

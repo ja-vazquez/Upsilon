@@ -11,11 +11,11 @@ if len(sys.argv) > 2:
     if len(sys.argv) > 4:
         extra ='%s'%(sys.argv[4])
 else:
+   
     print_message()
 
 #--------------------------
 
-#extra     = extra()
 
 lnum =  R0_files()
 dir_chains = chain_dir(data_type)
@@ -24,7 +24,11 @@ for redz in redzz:
     file  = files_name(data_type, bin_type, redz)
      
     for _, num in enumerate(lnum): 
-	file_num_extra = '%s%i%s'%(file, num, extra)
+        if len(sys.argv) > 4:
+	   file_num_extra = '%s%i%s'%(file, num, extra)
+        else:
+           file_num_extra = '%s%i'%(file, num)
+
         wq_input = """
 mode: bycore
 N: 1

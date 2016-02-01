@@ -19,7 +19,7 @@ else:
 dir_chains = chain_dir(data_type)
 dir_data   = 'lrgdata-final/mocks_lrg/sim_reshaped/'
 
-#extra     = extra()
+
 name_root =  '_ups'
 name_ups  =  '_ups.dat'
 name_cov  =  '_cov.dat'
@@ -31,7 +31,7 @@ lnp  = number_of_points(data_type, bin_type)
 if len(lnum) != len(lnp):  sys.exit("Error: check number of files")
 
 
-averr = 0.0 if 'rebin' in bin_type else 0.5
+averr = 0.5 if 'rebin' in bin_type else 0
 #------------------------------------------------------------------
 
 
@@ -40,8 +40,10 @@ for redz in redzz:
 
     for n, num in enumerate(lnum):  
 	np  = lnp[n]
-	file_num_extra = '%s%i%s'%(file, num, extra)
-       
+        if len(sys.argv) > 4:
+	   file_num_extra = '%s%i%s'%(file, num, extra)
+        else:
+           file_num_extra = '%s%i'%(file, num)
  
         with open('INI_%s.ini'%(file_num_extra), 'w') as f:
            ini_input = Text_ini_file() + Text_ini_file2()  

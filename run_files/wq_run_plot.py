@@ -4,11 +4,11 @@ import os, sys, time
 
 #Check Useful.py for info
 
-data_type = 'lowz' 
-bin_type  = 'log1' 
-redz      = 'z2' 
+data_type = 'mocks' 
+bin_type  = 'lin1' 
+redz      = '_steps_' 
 
-Plot_all = True
+Plot_all = False
 
 #---------------------------------------------------
 

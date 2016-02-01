@@ -17,19 +17,18 @@ dir_chains = chain_dir(data_type)
 dir_data = 'lrgdata-final/mocks_lrg/sim_reshaped/'
 
 #--------------------------
-extra     = extra()
 name_root =  '_ups'
 name_ups  =  '_ups.dat'
 name_cov  =  '_cov.dat'
 
 
 	#empty or b20
-b20 = '_b20'
+b20 = ''
 
 lnum =  R0_files()
 lnp  = number_of_points(data_type, bin_type)
 
-averr = 1.0 if 'rebin' in bin_type else 0.5
+averr = 0.0 if 'rebin' in bin_type else 0.5
 #------------------------------------------------------------------
 
 
@@ -37,7 +36,7 @@ for redz in redzz:
     file  = files_name(data_type, bin_type, redz)
     for n, num in enumerate(lnum):
         np  = lnp[n]
-        file_num_extra = '%s%i%s'%(file, num, extra)
+        file_num_extra = '%s%i'%(file, num)
 
 	# read best fit values
         file_bf = 'stats/' + file_num_extra + name_root + '.likestats'
