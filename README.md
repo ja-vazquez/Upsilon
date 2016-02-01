@@ -5,7 +5,7 @@ Calculation are based on [Rachel's paper](http://arxiv.org/abs/1207.1120v3).
 Some of the improvements, compared to previous versions, are:
 
 * The computation of the non-linear power spectrum up to k~1 h/Mpc using the 
- 	[Coyote emulator](http://www.hep.anl.gov/cosmology/CosmicEmu/emu.html). We may consider the [HMcode](https://github.com/alexander-mead/hmcode) later.
+        [Coyote emulator](http://www.hep.anl.gov/cosmology/CosmicEmu/emu.html). We may consider the [HMcode](https://github.com/alexander-mead/hmcode) later.
  
 * To compute correlation fuctions, and speed things up, we have incorporated the fast fourier transform ([FFTLog](http://casa.colorado.edu/~ajsh/FFTLog/#motivation)). 
  
@@ -20,6 +20,9 @@ in [Bitbucket](https://bitbucket.org/sukhdeep89/lowz_clustering_lensing).
 ``read_data.py`` is used to clean and give the appropiate format to the data provided by Sukhdeep: 
 rezised the correlation function gg and gm, and
 the covariance matrix considering only values up to 70 Mpc (also eliminating the first point).
+
+* input options for simulations, mocks, lowz and/or jackknives 
+can be found in the *Useful_data.py* file
 
 
 ``wq_run.py `` useful to place files in the queue of the bnl/astro cluster.
