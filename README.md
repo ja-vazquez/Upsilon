@@ -17,8 +17,10 @@ in [Bitbucket](https://bitbucket.org/sukhdeep89/lowz_clustering_lensing).
 
 ###Files 
 
-``read_data.py`` is used to rezise the correlation function gg and gm, and
+``read_data.py`` is used to clean and give the appropiate format to the data provided by Sukhdeep: 
+rezised the correlation function gg and gm, and
 the covariance matrix considering only values up to 70 Mpc (also eliminating the first point).
+
 
 ``wq_run.py `` useful to place files in the queue of the bnl/astro cluster.
 This will produce .Ini files --for CosmoMC-- and wq scripts for the cluster.

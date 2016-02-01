@@ -1,10 +1,10 @@
 # Script to read Sukhdeep files and modify their format to a CosmoMC
 
 import numpy as np
-from Useful import *
+from Useful_data import *
 
-data_type = 'mocks'			#sim, mocks,lowz
-
+data_type = 'lowz'			#sim, mocks,lowz
+jackknife  = True
 
         #select type of file to anlayze
 bin_type, redzz, dir = file_choice(data_type)
@@ -24,8 +24,12 @@ fline = 1				#skip first line
 #---------------------------------------------
 
 for i in range(100):
- name_ups  = '_jk%i_ups.dat'%(i)
- name_cov  = '_jk%i_cov.dat'%(i)
+ 
+ name_ups  = '_ups.dat'
+ name_cov  = '_cov.dat'
+ if jackknife:
+    name_ups = '_jk%i'%(i) + name_ups
+    name_cov = '_jk%i'%(i) + name_cov
 
  for redz in redzz:			 #select the file's name
    file_name = files_name(data_type, bin_type, redz)
