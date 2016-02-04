@@ -21,7 +21,7 @@
 ##sigma_8 and b1 from the 100 jacknives
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_s8.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mokcs_b1.jpg)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_b1.jpg)
 
 ##gg and gm from best-fit values
 ###R0 = 2
