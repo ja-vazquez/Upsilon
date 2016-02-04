@@ -1,6 +1,6 @@
 #Lowz Jks
 
-##sigma_8 and b1 from the 100 jacknives
+##sigma_8 and b1 from the 100 jacknives (b2=0)
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_s8.jpg)
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_b1.jpg)
@@ -18,7 +18,7 @@
 
 #Mocks
 
-##sigma_8 and b1 from the 100 jacknives
+##sigma_8 and b1 from the 100 jacknives (b2=0)
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_s8.jpg)
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_b1.jpg)
