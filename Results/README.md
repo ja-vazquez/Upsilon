@@ -2,7 +2,8 @@
 
 ##sigma_8 and b1 from the 100 jacknives
 
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_s8.jpg =500x)
+
+![](https://github.com/ja-vazquez/Upsilon/tree/master/Results/Lowz_s8.jpg =500x)
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/LLowz_b1.jpg =500x)
 
 ##gg and gm from best-fit values
