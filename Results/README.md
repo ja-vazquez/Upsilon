@@ -1,36 +1,32 @@
-#Lowz Jks
-
-##sigma_8 and b1 from the 100 jacknives (b2=0)
-
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_s8.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_b1.jpg)
+###Comparison of the matter power spectrum computed by using only camb (red) and the *FrankenEmu*  emulator (blue)
 
 
-##gg and gm from best-fit values
-###R0 = 2 
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Pk.jpg)
 
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_gg_R02.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_gm_R02.jpg)
+###Comparison of the correlation function associated to the non-linear power spectrum (or FrankEmu), using an straightforward integration (implemented by Anze) and using the FFTlog, displayed as follows: 
 
-###R0 = 10
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_gg_R10.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Lowz_gm_R10.jpg)
 
-#Mocks
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Xi.jpg)
 
-##sigma_8 and b1 from the 100 jacknives (b2=0)
+###As a double check, we plot best-fit theoretical curves along with measurements
 
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_s8.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_b1.jpg)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gg_r010.jpg) 
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gg_r04.jpg) 
 
-##gg and gm from best-fit values
-###R0 = 2
 
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_gg_R02.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_gm_R02.jpg)
+###Considering the 100 Jacknives provided by Sukhdeep - mocks_RST_steps_rebin1_DM1 -, we computed the best-fit set of parameters and plot them, i.e. **b1 below**
 
-###R0 = 10
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_gg_R10.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Mocks_gm_R10.jpg)
+
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Jk_r10.jpg)
+
+
+###then, take mean values and 1-standard deviation (multitply by x10), and get the following graph
+
+
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/s8.jpg)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/b1.jpg)
+
+
+
 
 
