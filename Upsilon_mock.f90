@@ -61,16 +61,16 @@ type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl
 type(CSpline) :: PkSpl, PkABSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
                                 
-real, parameter :: zdatafid = 0.23, maxrgg=100.0, maxrgm=100.0
+real, parameter :: zdatafid = 0.23, maxrgg=150.0, maxrgm=150.0 
 !be the actual redshift of simulations. 
 real, parameter :: finalcor =0.00
 integer, parameter :: MAXNP=200
 real*8 :: pi_ = 4*ATAN(1d0)
-real*8, parameter :: alnkmin=log(1d-3), alnkmax=log(10d0), alnkmin2=log(1d-3), alnkmax2=log(10.0d0) 
+real*8, parameter :: alnkmin=log(1d-3), alnkmax=log(10d0), alnkmin2=log(1d-3), alnkmax2=log(10d0)
 real :: bestchi2=1e30
 real :: deltabiasp
 
-integer, parameter  :: numr= 400  !Stop there
+integer, parameter  :: numr= 304  !Stop there
 
     contains
 
@@ -108,7 +108,7 @@ integer, parameter  :: numr= 400  !Stop there
        real  rl, t1 ,t2, rad
 
        type (CSpline) :: XiSpl, SigmaGG, SigmaGM, GetGG, GetGM
-       integer, parameter :: NR = 150 !// from 100 before.
+       integer, parameter :: NR = 150 !// from 100 before
        real, dimension (NR) :: xirr,xival, xival0,xival2, xilin, xi2lin, thgg, thgm
        real :: minr, maxr, corrfact, alphacross, gfactgg, gfactgm
        real :: gfactgg0, gfactgm0, s8, ryr, upscalib
@@ -123,7 +123,7 @@ integer, parameter  :: numr= 400  !Stop there
 
         
        integer, parameter  :: nn = 582 !Maximum # cause of the fft code
-       double precision x(6), y(1164) 
+       double precision x(7), y(1164) 
        real, dimension (582):: new_k, new_pk, k_lin, pk_lin 
        integer t(1)
 
@@ -132,7 +132,7 @@ integer, parameter  :: numr= 400  !Stop there
        integer, parameter  :: nq = 70
        real, dimension (nq):: new_q, new_pq, new_Pkk
 
-       if (virgin.and.use_upsilon<100) then
+       if (virgin.and.use_upsilon<101) then
           call InitUpsilon
           virgin=.False.
        end if
@@ -141,21 +141,23 @@ integer, parameter  :: numr= 400  !Stop there
        if (use_coyote) then 
           print *,'Using Coyote emulator'
           x(1) = CMB%ombh2                  ! omega_b 
-          x(2) = CMB%omdmh2 + CMB%ombh2     ! omega_m
+          x(2) = CMB%omdmh2 + CMB%ombh2 + CMB%omnuh2     ! omega_m
           x(3) = CMB%InitPower(1)           ! n_s
-          x(4) = -1.000                     ! w
-          x(5) = Theory%sigma_8             ! sigma8
-          x(6) = zdatafid*1.0               ! redshift
+          x(4) = CMB%H0
+          x(5) = -1.000                     ! w
+          x(6) = Theory%sigma_8             ! sigma8
+          x(7) = zdatafid*1.0               ! redshift
+   
           t(1) = 2                          ! 1= D^2, 2= P(k)        
-
-          call emu_noh(x,y,t)
+         print *, CMB%H0, CMB%omdmh2 + CMB%ombh2, CMB%omnuh2
+         print *, Theory%sigma_8 
+          call emu(x,y,t)
 
           h0 = CMB%H0/100.0
           do ii=1, nn
-             new_k(ii)  = y(ii)/h0
-             new_pk(ii) = y(ii+ nn)*h0**3.0    
+             new_k(ii)  = y(ii)*1.4 !/h0   !!!Need to check these 'random' numbers
+             new_pk(ii) = y(ii+ nn)*0.408 !*h0**3.0
           enddo   
-      
           call CoyoSpl%init(new_k, new_pk)
           call IniFFT(ru, fftlog, CMB,Theory, zdatafid*1.0_dl, 0)
           call FFTSpl%init(REAL(ru), REAL(fftlog))
@@ -169,8 +171,8 @@ integer, parameter  :: numr= 400  !Stop there
 
        call PkkSpl%init(k_lin, pk_lin)
 
-       minr = 1.0
-       maxr = 100.0
+       minr = 2.0  
+       maxr = 150.0
 
        do ii = 1, NR
           xirr(ii) = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
@@ -201,7 +203,7 @@ integer, parameter  :: numr= 400  !Stop there
        s8       = Theory%sigma_8
        upscalib = CMB%upscalib
 
-       DLRG%bias   = CMB%upsdata(10)/s8
+       DLRG%bias   = CMB%upsdata(10) !/s8
        DLRG%biasp  = CMB%upsdata(11)
        DLRG%biaspp = CMB%upsdata(12) 
  
@@ -275,14 +277,14 @@ integer, parameter  :: numr= 400  !Stop there
           biaspp = D%biaspp
           bfuncselector = D%bselector
 
-          gfactgg=MatterPowerat_Z(Theory,0.1_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.1_dl,zdatafid*1.0_dl)
-          gfactgm=MatterPowerat_Z(Theory,0.1_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.1_dl,zdatafid*1.0_dl)
+          gfactgg=MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
+          gfactgm=MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
 
-          gfactgg0=MatterPowerat_Z(Theory,0.1_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.1_dl,0.0_dl)
-          gfactgm0=MatterPowerat_Z(Theory,0.1_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.1_dl,0.0_dl)
+          gfactgg0=MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
+          gfactgm0=MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
 
-          minr = 1.0
-          maxr = 100.0
+          minr = 2.0     
+          maxr = 150.0   
 
           do ii=1,NR
              rad      = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
@@ -293,7 +295,7 @@ integer, parameter  :: numr= 400  !Stop there
              else
                 if (upsilon_option.ne.1.and.upsilon_option.ne.2) then
                    xival(ii) = xival0(ii)*XiCorr(CMB,Theory,xirr(ii),(D%zdatagg+D%zdatagm)/2.0)
-                   !  print *, 'Xi', rad, xival(ii), FFTSpl%eval(real(rad))
+                     print *, 'Xi', rad, xival(ii), FFTSpl%eval(real(rad))
                 else if (upsilon_option.eq.1) then
                    xival(ii) = xival0(ii) * XiCorr(CMB,Theory,xirr(ii),zdatafid)                    
                 else if (upsilon_option.eq.2) then
@@ -376,7 +378,7 @@ integer, parameter  :: numr= 400  !Stop there
           real*8 x
           real tr, xi, xi_A
           tr= sqrt(rad**2+x**2)
-          xi = XiSpl%eval (tr) * gfactgm
+         xi = XiSpl%eval (tr) * gfactgm
 
           if (use_XiAB) then
             xi_A = Xi_ASpl%eval(tr)
@@ -729,7 +731,7 @@ integer, parameter  :: numr= 400  !Stop there
       real*8  mu,nc,q,r,rk
       real*8 wsave(2*NMAX+3*(NMAX/2)+19)
 
-      integer, parameter:: nnm = 400  !Stop there
+      integer, parameter:: nnm = 304  !Stop there
       integer what 
       real*8 kk(nnm), Pkk(nnm), kx(nnm) 
       real*8 rx 
@@ -737,12 +739,12 @@ integer, parameter  :: numr= 400  !Stop there
       parameter (n = numr) 
       real*8 ru(numr), fftlog(numr)  
      
-      logrmin = -5.  
-      logrmax =  3. 
+      logrmin = -6.  
+      logrmax =  1.5  
       mu   = 0.5d0
       q    = 0.0d0
-      kr   = 0.5d0 
-      kropt= 3 
+      kr   = 0.5d0  
+      kropt= 3  
       dir  = 1
 
       logrc=(logrmin+logrmax)/2.d0
@@ -750,28 +752,29 @@ integer, parameter  :: numr= 400  !Stop there
       dlogr=(logrmax-logrmin)/n
       dlnr=dlogr*log(10.d0)
 
-      kx(1)     = log10(1d-5) 
-      kx(2)     = log10(1d-4)
-      kx(nnm-1) = log10(1d2)  
-      kx(nnm)   = log10(1d3) 
+      kx(1)     = log10(1d-4) !log10(1d-6) !-5 
+      !kx(2)     = log10(1d-3) !-4
+      !kx(nnm-1) = log10(1d2)  !2
+      kx(nnm)   = log10(1d2) !log10(1d4)  !3
       Pkk(1)    = 0  
-      Pkk(2)    = 0
-      Pkk(nnm-1)= 0  
-      Pkk(nnm)  = 0     
-         
+      !Pkk(2)    = 0
+      !Pkk(nnm-1)= 0  
+      !Pkk(nnm)  = 0     
  
-      do i = 3,nnm-2
-        if (what.eq.0) then
-          kk(i)  = exp(alnkmin+(i-3)*(alnkmax-alnkmin)/(nnm-5.0)) 
-          if(upsilon_option.eq.3) then
-             Pkk(i) = PkkSpl%eval(real(kk(i)))
-          else
+      do i = 2, nnm -1 !3,nnm-2
+!        if (what.eq.0) then
+          kk(i)  = exp(alnkmin+(i-2.0)*(alnkmax-alnkmin)/(nnm-3.0)) ! -3, -5
+!          if(upsilon_option.eq.3) then
+!             Pkk(i) = PkkSpl%eval(real(kk(i)))
+!          else
              Pkk(i) = CoyoSpl%eval(real(kk(i)))
-          end if
-        else                    
-             kk(i)  = exp(alnkmin2 +(i-3)*(alnkmax2 - alnkmin2)/(nnm-5.0))
-             Pkk(i) = PkABSpl%eval(real(kk(i))) 
-        end if
+!             Pkk(i) = MatterPowerat_Z(Theory,DBLE(kk(i)),zdatafid*1.0_dl)
+!print *, kk(i), Pkk(i), CoyoSpl%eval(real(kk(i)))
+!          end if
+!        else                    
+!             kk(i)  = exp(alnkmin2 +(i-3)*(alnkmax2 - alnkmin2)/(nnm-5.0))
+!             Pkk(i) = PkABSpl%eval(real(kk(i))) 
+!        end if
 
         kx(i)  = log10(kk(i))
       end do
