@@ -15,6 +15,11 @@ Fiducial refer to s8 = 0.83, b1 =1.8
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gg.jpg) 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gm.jpg) 
 
+###Similar thing got Sukhdeep!
+
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gm_Sukhdeep.jpg)
+
+
 
 ###Considering the 100 Jacknives provided by Sukhdeep - mocks_RST_steps_rebin1_DM1 -, we computed the best-fit set of parameters and plot them, i.e. **b1 below**
 
