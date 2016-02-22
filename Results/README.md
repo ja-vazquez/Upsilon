@@ -13,7 +13,7 @@ Fiducial refer to s8 = 0.83, b1 =1.8
 ###As a double check, we plot best-fit theoretical curves along with measurements
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gg.jpg) 
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gg.jpg) 
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/gm.jpg) 
 
 
 ###Considering the 100 Jacknives provided by Sukhdeep - mocks_RST_steps_rebin1_DM1 -, we computed the best-fit set of parameters and plot them, i.e. **b1 below**
