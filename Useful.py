@@ -8,9 +8,9 @@ def chain_dir(data_type):
     if 'sim' in data_type:
 	dir += 'Sim/'
     elif 'mocks' in data_type:
-        dir += 'Mocks_linPk_jk/'
+        dir += 'Mocks_jk/'
     elif 'lowz' in data_type:
-        dir += 'Lowz_jk_b20/'
+        dir += 'Lowz_jk/'
     return dir
 
 
@@ -23,8 +23,8 @@ def file_choice(data_type):
        dir  = 'sim_results/'
 
     elif 'mocks' in data_type:
-       bin_type = ['rebin1'] #,'lin1']                    #lin1 or rebin1
-       redzz = ['_','_steps_']
+       bin_type = ['rebin1'] #,'rebin1',lin1]                    #lin1 or rebin1
+       redzz = ['_steps_'] #'_steps_'
        dir  = 'mock_results/'
 
     elif 'lowz' in data_type:
@@ -158,13 +158,13 @@ get_sigma8=T
 use_Ups = T
 use_mock = T
 
-use_coyote = F
+use_coyote = T
 use_XiAB = F
 
 #if use_coyote = F :upsilon_option (2) Xi, (1) Xicorr, (3) FFT_Pk linear
 #if use_coyote = T :upsilon_option (0) FFT_Coyo
 
-upsilon_option = 1\n"""
+upsilon_option = 0\n"""
 	return txt 
 
 
@@ -172,7 +172,7 @@ upsilon_option = 1\n"""
 
 def Text_ini_file2():
         txt = """
-param[LRGa] = 1.55 1 2 0.02 0.02
+param[LRGa] = 1.55 1 2.5 0.02 0.02
 param[LRGb] = 0 0 0 0 0
 #param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
 param[logA] = 2.9 2.5 3.25 0.05 0.05
@@ -197,9 +197,9 @@ param[ns] = 0.965 0.965 0.965 0 0"""
 	txt = """
 #h = 0.677, Omega_lamda= 0.692885, Omega_matter= 0.307115, 
 #Omega_baryons= 0.048206, n=0.96
-param[omegabh2] = 0.022094 0.022094 0.022094 0 0 
-param[omegach2] = 0.118666 0.118666 0.118666 0 0
-param[theta] = 1.0396892 1.0396892 1.0396892 0 0
+param[omegabh2] = 0.022140 0.022140 0.022140 0 0 
+param[omegach2] = 0.118911 0.118911 0.118911 0 0 
+param[theta] = 1.040042 1.040042 1.040042 0 0 
 param[ns] = 0.96 0.96 0.96 0 0"""
 	
    return txt
