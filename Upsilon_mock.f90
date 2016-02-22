@@ -140,13 +140,13 @@ integer, parameter  :: numr= 304  !Stop there
         !Non-linear Theory
        if (use_coyote) then 
           print *,'Using Coyote emulator'
-          x(1) = CMB%ombh2                  ! omega_b 
-          x(2) = CMB%omdmh2 + CMB%ombh2 + CMB%omnuh2     ! omega_m
-          x(3) = CMB%InitPower(1)           ! n_s
-          x(4) = CMB%H0
+          x(1) =   CMB%ombh2               ! omega_b 
+          x(2) =   CMB%omdmh2 + CMB%ombh2  ! omega_m
+          x(3) =   CMB%InitPower(1)        ! n_s
+          x(4) =   CMB%H0
           x(5) = -1.000                     ! w
-          x(6) = Theory%sigma_8             ! sigma8
-          x(7) = zdatafid*1.0               ! redshift
+          x(6) =  Theory%sigma_8            ! sigma8
+          x(7) = 0.267                      ! redshift
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        
          print *, CMB%H0, CMB%omdmh2 + CMB%ombh2, CMB%omnuh2
@@ -155,8 +155,9 @@ integer, parameter  :: numr= 304  !Stop there
 
           h0 = CMB%H0/100.0
           do ii=1, nn
-             new_k(ii)  = y(ii)*1.4 !/h0   !!!Need to check these 'random' numbers
-             new_pk(ii) = y(ii+ nn)*0.408 !*h0**3.0
+             new_k(ii)  = y(ii)/h0
+             new_pk(ii) = y(ii+ nn)*h0**3.0
+
           enddo   
           call CoyoSpl%init(new_k, new_pk)
           call IniFFT(ru, fftlog, CMB,Theory, zdatafid*1.0_dl, 0)
@@ -277,11 +278,11 @@ integer, parameter  :: numr= 304  !Stop there
           biaspp = D%biaspp
           bfuncselector = D%bselector
 
-          gfactgg=MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
-          gfactgm=MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
+          gfactgg= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
+          gfactgm= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
 
-          gfactgg0=MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
-          gfactgm0=MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
+          gfactgg0= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
+          gfactgm0= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
 
           minr = 2.0     
           maxr = 150.0   
