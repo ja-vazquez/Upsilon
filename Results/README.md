@@ -1,7 +1,7 @@
 ###Comparison of the matter power spectrum computed by using only camb (red) and the *FrankenEmu*  emulator (blue)
 
 
-Fiducial refer to s8 = 0.83, b1 =1.8
+Fiducial refer to s8 = 0.83, b1 =1.8, z=2.7
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Pk.jpg)
 
@@ -28,7 +28,7 @@ Fiducial refer to s8 = 0.83, b1 =1.8
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/s8.jpg)
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/b1.jpg)
-
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/b2.jpg)
 
 
 ###Similar thing got Sukhdeep!
