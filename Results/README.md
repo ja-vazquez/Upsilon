@@ -38,4 +38,4 @@ Fiducial refer to s8 = 0.83, b1 =1.8, z=2.7
 ###And for the simulations
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Sim_z0.25.jpg)
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/sim_b1.jpg)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/Sim_b1.jpg)
