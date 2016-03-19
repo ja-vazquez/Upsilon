@@ -146,7 +146,7 @@ integer, parameter  :: numr= 304  !Stop there
           x(4) =   CMB%H0
           x(5) = -1.000                     ! w
           x(6) =  Theory%sigma_8            ! sigma8
-          x(7) = 0.267                      ! redshift
+          x(7) = z_gg                      ! redshift
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        
          print *, CMB%H0, CMB%omdmh2 + CMB%ombh2, CMB%omnuh2
@@ -199,7 +199,7 @@ integer, parameter  :: numr= 304  !Stop there
        !-----------
 
 
-       rhobar = 2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
+       rhobar =  1.0 !2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
 
        s8       = Theory%sigma_8
        upscalib = CMB%upscalib

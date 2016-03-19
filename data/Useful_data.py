@@ -4,8 +4,8 @@
 def file_choice(data_type):
 	#Select the type of file to analyze
     if 'sim' in data_type:
-       bin_type = 'lin_bin1'                #lin or log / bin or rebin
-       redzz = ['0.25','0.40']
+       bin_type = 'lin_rebin'                #lin or log / bin or rebin
+       redzz = ['0.25'] #,'0.40']
        dir  = 'sim_results/'
 
     elif 'mocks' in data_type:
@@ -14,8 +14,8 @@ def file_choice(data_type):
        dir  = 'mock_results/'
 
     elif 'lowz' in data_type:
-       bin_type = 'log1_rebin'              #log1 or log1_rebin
-       redzz = ['z1'] #, 'z1', 'z2']
+       bin_type = 'log1'              #log1 or log1_rebin
+       redzz = ['lowz'] #, 'z1', 'z2']
        dir = 'lowz_results/'
 
     return bin_type, redzz, dir

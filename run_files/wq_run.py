@@ -5,7 +5,7 @@ from Useful import *
 
         #lin or log, sim or mocks
   
-data_type = 'mocks'
+data_type = 'sim'
 jackknife = True
 jks 	  = 100
 
@@ -14,7 +14,7 @@ bin_type, redzz, dir = file_choice(data_type)
 #----------------------------------
 lnum  = R0_files()
 
-for i in range(jks):
+for i in range(100): #jks):
      extra = '_jk%i'%(i) if jackknife else ''
      for bin in bin_type:
         for redz in redzz:
@@ -26,6 +26,4 @@ for i in range(jks):
                 nohup wq sub  wq_%s%i%s.ini &
               """%(data_type, bin, redz, extra, data_type, bin, redz, extra, file, num, extra)
               os.system(commd)
-              time.sleep(0.7) 
- 
-
+              time.sleep(1.) 

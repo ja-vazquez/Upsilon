@@ -3,7 +3,7 @@
 import numpy as np
 from Useful_data import *
 
-data_type = 'lowz'			#sim, mocks,lowz
+data_type = 'sim'			#sim, mocks,lowz
 jackknife  = True
 
         #select type of file to anlayze

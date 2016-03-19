@@ -6,7 +6,7 @@ def extra():
 def chain_dir(data_type):
     dir = 'chains/'
     if 'sim' in data_type:
-	dir += 'Sim/'
+	dir += 'Sim_jk_b2/'
     elif 'mocks' in data_type:
         dir += 'Mocks_jk/'
     elif 'lowz' in data_type:
@@ -18,8 +18,8 @@ def chain_dir(data_type):
 def file_choice(data_type):
 	#Select the type of file to analyze
     if 'sim' in data_type:
-       bin_type = 'lin_bin1'                #lin or log / bin or rebin
-       redzz = ['0.25','0.40']
+       bin_type = ['lin_rebin']                #lin or log / bin or rebin
+       redzz = ['0.25'] #,'0.40']
        dir  = 'sim_results/'
 
     elif 'mocks' in data_type:
@@ -45,7 +45,7 @@ def z_mean(data_type, redz):
 	elif 'z2' in redz:
 	    return '0.31'
      else:
- 	return '0.267'
+ 	return '0.27'
 
 
 
@@ -76,8 +76,8 @@ def  number_of_points(data_type, bin_type):
           lnp  =  134, 132, 130, 128, 126, 118, 98
       elif 'lin_bin2' in bin_type:
           lnp  = 76, 76, 74, 74, 72, 68, 58
-      elif 'lin_rebin1' in bin_type:
-          lnp = 26, 24, 24, 22, 22, 18, 12
+      elif 'lin_rebin' in bin_type:
+	  lnp = 102, 90, 82, 74, 70, 54
       elif 'lin_rebin2' in bin_type:
           lnp = 26, 24, 24, 22, 22, 18, 12
       elif 'log_bin1' in bin_type:
@@ -154,7 +154,7 @@ get_sigma8=T
 
 #-------------------------------------##
 
-#not in use (both)
+#not used now (both)
 use_Ups = T
 use_mock = T
 
@@ -173,9 +173,9 @@ upsilon_option = 0\n"""
 def Text_ini_file2():
         txt = """
 param[LRGa] = 1.55 1 2.5 0.02 0.02
-param[LRGb] = 0 0 0 0 0
-#param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
-param[logA] = 2.9 2.5 3.25 0.05 0.05
+#param[LRGb] = 0 0 0 0 0
+param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
+param[logA] = 2.9 2.5 3. 0.05 0.05
 
 use_upsilon= 98
 samples = 10000000"""

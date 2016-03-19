@@ -4,9 +4,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pylab
 
-data_type = 'mocks'
+data_type = 'sim'
 
-dir_jk    = 'Jackknife_mocks_linPk/'
+dir_jk    = 'Jackknife/'
 dir_chains = chain_dir(data_type)
 
 bin_type, redzz, dir = file_choice(data_type)
@@ -38,7 +38,7 @@ for bin in bin_type:
                b2t.append(b2)
 	       H0t.append(H0)
                with open(dir_jk + output + '.dat','a') as f:
-                   f.write("%i \t %2.6f \t %2.6f \t %2.6f \n"%(i, s8, b1, H0))
+                   f.write("%i \t %2.6f \t %2.6f \t %2.6f \n"%(i, s8, b1, b2))
    
            s8T.append(s8t)
            b1T.append(b1t)
@@ -46,31 +46,31 @@ for bin in bin_type:
 	   H0T.append(H0t)  
 
            g.write("%i \t %2.6f \t %2.6f \t %2.6f \t %2.6f \t %2.6f \t %2.6f \n"%(R0, np.mean(s8t),
-	     np.std(s8t),np.mean(b1t),np.std(b1t),np.mean(H0t), np.std(H0t)))
+	     np.std(s8t),np.mean(b1t),np.std(b1t),np.mean(b2t), np.std(b2t)))
   	       #print np.mean(s8t), np.mean(b1t), np.mean(b2t)
  	       #print np.std(s8t),  np.std(b1t),  np.std(b2t)
 
         if True:
  		fig =pylab.figure(figsize=(14,7))
 		ax = fig.add_subplot(2,3,1)
- 		ax.plot(b1T[0], 'ro', label='R0 =2', color = 'b')
+ 		ax.plot(s8T[0], 'ro', label='R0 =2', color = 'b')
  		plt.legend()
  		ax2 = fig.add_subplot(2,3,2)
- 		ax2.plot(b1T[1], 'ro', label='R0 =3', color = 'b')
+ 		ax2.plot(s8T[1], 'ro', label='R0 =3', color = 'b')
  		plt.legend()
  		ax3 = fig.add_subplot(2,3,3)
- 		ax3.plot(b1T[2], 'ro', label='R0 =4', color = 'b')
+ 		ax3.plot(s8T[2], 'ro', label='R0 =4', color = 'b')
  		plt.title(file_name)
  		plt.legend()
  		ax4 = fig.add_subplot(2,3,4)
- 		ax4.plot(b1T[3], 'ro', label='R0 =5', color = 'b')
+ 		ax4.plot(s8T[3], 'ro', label='R0 =5', color = 'b')
  		plt.legend()
  		ax5 = fig.add_subplot(2,3,5)
- 		ax5.plot(b1T[4], 'ro', label='R0 =6', color = 'b')
+ 		ax5.plot(s8T[4], 'ro', label='R0 =6', color = 'b')
  		plt.legend()
  		ax6 = fig.add_subplot(2,3,6)
- 		ax6.plot(b1T[5], 'ro', label='R0 =10', color = 'b')
+ 		ax6.plot(s8T[5], 'ro', label='R0 =10', color = 'b')
  		plt.legend()
- 		plt.savefig(dir_jk + file_name + '_b1.pdf')
+ 		plt.savefig(dir_jk + file_name + '_s8.pdf')
  		plt.show()
 
