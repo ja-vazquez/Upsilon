@@ -277,12 +277,21 @@ integer, parameter  :: numr= 304  !Stop there
           biasp  = D%biasp
           biaspp = D%biaspp
           bfuncselector = D%bselector
+               
+          if (use_coyote) then
+             gfactgg= 1. 
+             gfactgm= 1. 
 
-          gfactgg= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
-          gfactgm= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
+             gfactgg0= 1. 
+             gfactgm0= 1. 
+          else
+             gfactgg= MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
+             gfactgm= MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
 
-          gfactgg0= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
-          gfactgm0= 1. !MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
+             gfactgg0= MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
+             gfactgm0= MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
+          end if
+
 
           minr = 2.0     
           maxr = 150.0   
