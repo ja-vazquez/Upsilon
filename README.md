@@ -67,3 +67,8 @@ extracted from the jacknives.
 * mean redshift: z= 0.267
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/sigma8.jpg)
+
+###Preliminary results
+
+see
+[Results](https://github.com/ja-vazquez/Upsilon/tree/master/Results)
