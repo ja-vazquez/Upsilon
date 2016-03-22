@@ -145,7 +145,7 @@ integer, parameter  :: numr= 304  !Stop there
           x(3) =   CMB%InitPower(1)        ! n_s
           x(4) =   CMB%H0
           x(5) = -1.000                     ! w
-          x(6) =  Theory%sigma_8            ! sigma8
+          x(6) =  0.82*CMB%hola             !/Theory%sigma_8            ! sigma8
           x(7) = z_gg                      ! redshift
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        

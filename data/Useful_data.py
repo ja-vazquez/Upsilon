@@ -9,7 +9,7 @@ def file_choice(data_type):
        dir  = 'sim_results/'
 
     elif 'mocks' in data_type:
-       bin_type = 'lin1'                    #lin1 or rebin1
+       bin_type = 'rebin1'                    #lin1 or rebin1
        redzz = ['steps_','']
        dir  = 'mock_results/'
 
@@ -27,7 +27,8 @@ def files_name(data_type, bin_type, redz):
      if 'sim' in data_type:
         file_name = data_type +'_'+ bin_type +'_z'+ redz +'_norsd_np0.001_nRT10_r0'
      elif 'mocks' in data_type:
-        file_name = data_type +'_RST_'+ redz + bin_type + '_DM1_r0'
+#        file_name = data_type +'_RST_'+ redz + bin_type + '_DM1_r0'
+	file_name = 'mock_bigMD_RST_constnbar_' + bin_type + '_DM1_r0'
      elif 'lowz' in data_type:
         file_name =  redz + '_' + bin_type + '_r0'
      else:

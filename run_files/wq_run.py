@@ -5,16 +5,16 @@ from Useful import *
 
         #lin or log, sim or mocks
   
-data_type = 'sim'
-jackknife = True
-jks 	  = 100
+data_type = 'mocks'
+jackknife =  False #True
+jks 	  = 1 #100
 
 bin_type, redzz, dir = file_choice(data_type)
 
 #----------------------------------
 lnum  = R0_files()
 
-for i in range(100): #jks):
+for i in range(jks):
      extra = '_jk%i'%(i) if jackknife else ''
      for bin in bin_type:
         for redz in redzz:

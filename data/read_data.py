@@ -3,8 +3,9 @@
 import numpy as np
 from Useful_data import *
 
-data_type = 'sim'			#sim, mocks,lowz
-jackknife  = True
+data_type = 'mocks'			#sim, mocks,lowz
+jackknife  = False #True
+njacks     = 1 #100
 
         #select type of file to anlayze
 bin_type, redzz, dir = file_choice(data_type)
@@ -23,7 +24,7 @@ fline = 1				#skip first line
 
 #---------------------------------------------
 
-for i in range(100):
+for i in range(njacks):
  
  name_ups  = '_ups.dat'
  name_cov  = '_cov.dat'

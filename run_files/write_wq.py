@@ -31,8 +31,8 @@ for redz in redzz:
 
         wq_input = """
 mode: bycore
-N: 1
-threads: 1
+N: 9
+threads: 3
 hostfile: auto
 job_name: %s
 command: |

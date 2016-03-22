@@ -1,10 +1,11 @@
 
-from Useful import *
+
 import numpy as np
 from matplotlib import pyplot as plt
+from Useful import *
 import pylab
 
-data_type = 'sim'
+data_type = 'mocks'
 
 dir_jk    = 'Jackknife/'
 dir_chains = chain_dir(data_type)
@@ -53,24 +54,24 @@ for bin in bin_type:
         if True:
  		fig =pylab.figure(figsize=(14,7))
 		ax = fig.add_subplot(2,3,1)
- 		ax.plot(s8T[0], 'ro', label='R0 =2', color = 'b')
+ 		ax.plot(b1T[0], 'ro', label='R0 =2', color = 'b')
  		plt.legend()
  		ax2 = fig.add_subplot(2,3,2)
- 		ax2.plot(s8T[1], 'ro', label='R0 =3', color = 'b')
+ 		ax2.plot(b1T[1], 'ro', label='R0 =3', color = 'b')
  		plt.legend()
  		ax3 = fig.add_subplot(2,3,3)
- 		ax3.plot(s8T[2], 'ro', label='R0 =4', color = 'b')
+ 		ax3.plot(b1T[2], 'ro', label='R0 =4', color = 'b')
  		plt.title(file_name)
  		plt.legend()
  		ax4 = fig.add_subplot(2,3,4)
- 		ax4.plot(s8T[3], 'ro', label='R0 =5', color = 'b')
+ 		ax4.plot(b1T[3], 'ro', label='R0 =5', color = 'b')
  		plt.legend()
  		ax5 = fig.add_subplot(2,3,5)
- 		ax5.plot(s8T[4], 'ro', label='R0 =6', color = 'b')
+ 		ax5.plot(b1T[4], 'ro', label='R0 =6', color = 'b')
  		plt.legend()
  		ax6 = fig.add_subplot(2,3,6)
- 		ax6.plot(s8T[5], 'ro', label='R0 =10', color = 'b')
+ 		ax6.plot(b1T[5], 'ro', label='R0 =10', color = 'b')
  		plt.legend()
- 		plt.savefig(dir_jk + file_name + '_s8.pdf')
+ 		plt.savefig(dir_jk + file_name + '_b1.pdf')
  		plt.show()
 

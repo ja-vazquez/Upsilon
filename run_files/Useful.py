@@ -45,7 +45,7 @@ def z_mean(data_type, redz):
 	elif 'z2' in redz:
 	    return '0.31'
      else:
- 	return '0.27'
+ 	return '0.28'
 
 
 
@@ -54,7 +54,8 @@ def files_name(data_type, bin_type, redz):
      if 'sim' in data_type:
         file_name = data_type +'_'+ bin_type +'_z'+ redz +'_norsd_np0.001_nRT10_r0'
      elif 'mocks' in data_type:
-        file_name = data_type +'_RST'+ redz + bin_type + '_DM1_r0'
+	file_name = 'mock_bigMD_RST_constnbar_' + bin_type + '_DM1_r0' 
+#       file_name = data_type +'_RST'+ redz + bin_type + '_DM1_r0'
      elif 'lowz' in data_type:
         file_name = redz + '_' + bin_type + '_r0'
      else:
@@ -138,11 +139,14 @@ sampling_method = 1
 dragging_steps  = 5
 propose_scale = 2
 
+#If zero set automatically
+num_threads = 3
+
 indep_sample=0
 
 use_clik= F
 #MCMC = 0, JK =2
-action = 2
+action = 0
 
 #these are just small speedups for testing
 get_sigma8=T
@@ -175,7 +179,8 @@ def Text_ini_file2():
 param[LRGa] = 1.55 1 2.5 0.02 0.02
 #param[LRGb] = 0 0 0 0 0
 param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
-param[logA] = 2.9 2.5 3. 0.05 0.05
+#param[logA] = 2.9 2.5 3.3 0.05 0.05
+param[logA] = 3.076 3.076 3.076 0 0 
 
 use_upsilon= 98
 samples = 10000000"""
