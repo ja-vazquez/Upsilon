@@ -23,7 +23,7 @@ for i in range(jks):
               commd = """
                 python write_ini.py %s %s %s %s
                 python write_wq.py %s %s %s %s
-                nohup wq sub  wq_%s%i%s.ini &
+                #nohup wq sub  wq_%s%i%s.ini &
               """%(data_type, bin, redz, extra, data_type, bin, redz, extra, file, num, extra)
               os.system(commd)
               time.sleep(1.) 

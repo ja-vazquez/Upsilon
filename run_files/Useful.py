@@ -8,7 +8,7 @@ def chain_dir(data_type):
     if 'sim' in data_type:
 	dir += 'Sim_jk_b2/'
     elif 'mocks' in data_type:
-        dir += 'Mocks_jk/'
+        dir += 'Mocks_jk2/'
     elif 'lowz' in data_type:
         dir += 'Lowz_jk/'
     return dir
@@ -176,11 +176,11 @@ upsilon_option = 0\n"""
 
 def Text_ini_file2():
         txt = """
-param[LRGa] = 1.55 1 2.5 0.02 0.02
+param[LRGa] = 1.8 1 2.5 0.02 0.02
 #param[LRGb] = 0 0 0 0 0
 param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
-#param[logA] = 2.9 2.5 3.3 0.05 0.05
-param[logA] = 3.076 3.076 3.076 0 0 
+param[logA] = 3.076 2.8 3.2 0.05 0.05
+#param[logA] = 3.076 3.076 3.076 0 0 
 
 use_upsilon= 98
 samples = 10000000"""
