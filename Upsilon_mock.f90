@@ -149,8 +149,8 @@ integer, parameter  :: numr= 304  !Stop there
           x(7) = 0.0 !z_gg                      ! redshift
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        
-         print *, CMB%H0, CMB%omdmh2 + CMB%ombh2, CMB%omnuh2
-         print *, Theory%sigma_8 
+         !print *, CMB%H0, CMB%omdmh2 + CMB%ombh2, CMB%omnuh2
+         !print *, Theory%sigma_8 
           call emu(x,y,t)
 
           h0 = CMB%H0/100.0

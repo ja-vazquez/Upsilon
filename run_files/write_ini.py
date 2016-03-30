@@ -31,7 +31,7 @@ lnp  = number_of_points(data_type, bin_type)
 if len(lnum) != len(lnp):  sys.exit("Error: check number of files")
 
 
-averr = 0.5 if 'rebin' in bin_type else 0
+averr = 1.0 if 'rebin' in bin_type else 0
 #------------------------------------------------------------------
 
 

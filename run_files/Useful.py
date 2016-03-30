@@ -8,7 +8,7 @@ def chain_dir(data_type):
     if 'sim' in data_type:
 	dir += 'Sim_jk_b2/'
     elif 'mocks' in data_type:
-        dir += 'Mocks_jk2/'
+        dir += 'Mocks/'
     elif 'lowz' in data_type:
         dir += 'Lowz_jk/'
     return dir
@@ -24,7 +24,7 @@ def file_choice(data_type):
 
     elif 'mocks' in data_type:
        bin_type = ['rebin1'] #,'rebin1',lin1]                    #lin1 or rebin1
-       redzz = ['_steps_'] #'_steps_'
+       redzz = ['singlesnap', 'allsnap', 'evol']
        dir  = 'mock_results/'
 
     elif 'lowz' in data_type:
@@ -54,7 +54,7 @@ def files_name(data_type, bin_type, redz):
      if 'sim' in data_type:
         file_name = data_type +'_'+ bin_type +'_z'+ redz +'_norsd_np0.001_nRT10_r0'
      elif 'mocks' in data_type:
-	file_name = 'mock_bigMD_RST_constnbar_' + bin_type + '_DM1_r0' 
+	file_name = 'mock_bigMD_RST_' + redz + '_' + bin_type + '_DM1_r0' 
 #       file_name = data_type +'_RST'+ redz + bin_type + '_DM1_r0'
      elif 'lowz' in data_type:
         file_name = redz + '_' + bin_type + '_r0'
@@ -91,6 +91,8 @@ def  number_of_points(data_type, bin_type):
            lnp  =  134, 132, 130, 128, 126, 118
       elif 'rebin1' in bin_type:
            lnp = 28, 28, 28, 28, 28, 28
+      else:
+	   lnp = 28, 28, 28, 28, 28, 28
  
    elif 'lowz' in data_type:
       if 'rebin' in bin_type: 
