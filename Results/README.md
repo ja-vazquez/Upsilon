@@ -51,6 +51,6 @@ The results seem very consitent with values expected of b1, b2 and s8.
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_allsnap.jpg)
 
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_evol.jpg)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_evolv.jpg)
 
 
