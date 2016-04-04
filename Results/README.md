@@ -53,4 +53,15 @@ The results seem very consitent with values expected of b1, b2 and s8.
 
 ![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_evolv.jpg)
 
+## Lowz results
+
+Fitting all points (dropping off the first one)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/lowz.jpg)
+
+Fitting within the range 10 < r < 70
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/lowz_10_70.jpg)
+
+Fitting as Sukhdeep, within the range 20 < r < 70
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/lowz_20_70.jpg)
+
 
