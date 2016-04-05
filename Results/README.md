@@ -45,5 +45,23 @@ Fiducial refer to s8 = 0.83, b1 =1.8, z=2.7
 ##Sergio provided new mocks with fixed number clustering and number density.
 The results seem very consitent with values expected of b1, b2 and s8.
 
-![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks.jpg)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_constbar.jpg)
+
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_singlesnap.jpg)
+
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_allsnap.jpg)
+
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/mocks_evolv.jpg)
+
+## Lowz results
+
+Fitting as Sukhdeep, within the range 20 < r < 70
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/lowz_20_70.jpg)
+
+Fitting within the range 10 < r < 70
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/lowz_10_70.jpg)
+
+
+Fitting all points (dropping off the first one)
+![](https://github.com/ja-vazquez/Upsilon/blob/master/Results/figures/lowz.jpg)
 
