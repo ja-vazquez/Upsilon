@@ -10,7 +10,7 @@ def chain_dir(data_type):
     elif 'mocks' in data_type:
         dir += 'Mocks/'
     elif 'lowz' in data_type:
-        dir += 'Lowz_jk/'
+        dir += 'Lowz/'
     return dir
 
 
@@ -29,7 +29,7 @@ def file_choice(data_type):
 
     elif 'lowz' in data_type:
        bin_type = ['log1_rebin']              #log1 or log1_rebin
-       redzz = ['z1'] #, ['lowz''z1', 'z2']
+       redzz = ['lowz'] #, ['lowz''z1', 'z2']
        dir = 'lowz_results/'
 
     return bin_type, redzz, dir
@@ -96,7 +96,7 @@ def  number_of_points(data_type, bin_type):
  
    elif 'lowz' in data_type:
       if 'rebin' in bin_type: 
-           lnp = 28, 28, 28, 28, 28, 28
+           lnp =  28, 28, 28, 28, 28, 28
       else:
 	   lnp = 184, 164, 148, 136, 126, 100
 
@@ -179,8 +179,8 @@ upsilon_option = 0\n"""
 def Text_ini_file2():
         txt = """
 param[LRGa] = 1.8 1 2.5 0.02 0.02
-#param[LRGb] = 0 0 0 0 0
-param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
+param[LRGb] = 0 0 0 0 0
+#param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
 param[logA] = 3.076 2.8 3.2 0.05 0.05
 #param[logA] = 3.076 3.076 3.076 0 0 
 

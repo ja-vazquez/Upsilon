@@ -14,7 +14,7 @@ def file_choice(data_type):
        dir  = 'mock_results/'
 
     elif 'lowz' in data_type:
-       bin_type = 'log1'              #log1 or log1_rebin
+       bin_type = 'log1_rebin'              #log1 or log1_rebin
        redzz = ['lowz'] #, 'z1', 'z2']
        dir = 'lowz_results/'
 

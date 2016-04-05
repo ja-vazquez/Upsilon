@@ -198,8 +198,8 @@ integer, parameter  :: numr= 304  !Stop there
 
        !-----------
 
-
-       rhobar =  1.0 !2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
+        !Check this number, for mocks should be one
+       rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
 
        s8       = Theory%sigma_8
        upscalib = CMB%upscalib

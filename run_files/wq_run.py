@@ -5,7 +5,7 @@ from Useful import *
 
         #lin or log, sim or mocks
   
-data_type = 'mocks'
+data_type = 'lowz'
 jackknife =  False #True
 jks 	  = 1 #100
 
