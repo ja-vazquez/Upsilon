@@ -37,15 +37,17 @@ def file_choice(data_type):
 
 
 def z_mean(data_type, redz):
-     if 'lowz' in data_type:
-	if 'lowz' in redz:
-	    return '0.27'
-	elif 'z1' in redz:
-	    return '0.21'
-	elif 'z2' in redz:
-	    return '0.31'
-     else:
- 	return '0.28'
+    if 'lowz' in data_type:
+        if 'lowz' in redz:
+            return '0.27'
+        elif 'z1' in redz:
+            return '0.21'
+        elif 'z2' in redz:
+            return '0.31'
+    elif 'sim' in data_type:
+        return redz
+    else:
+        return '0.28'
 
 
 
@@ -111,6 +113,8 @@ def print_message():
 
 
 
+
+
 def Text_ini_file():
 	txt = """
 #DEFAULT(batch1/CAMspec_defaults.ini)
@@ -170,28 +174,33 @@ use_XiAB = F
 #if use_coyote = F :upsilon_option (2) Xi, (1) Xicorr, (3) FFT_Pk linear
 #if use_coyote = T :upsilon_option (0) FFT_Coyo
 
-upsilon_option = 0\n"""
+upsilon_option = 0\n\n"""
 	return txt 
 
 
+def R0_params(R0, nR0):
+    txt="""
+R0_gg    = %i.0
+R0_gm    = %i.0
+mock_NP  = %i
+mock_gg  = %i
+    """%(R0, R0, nR0, nR0//2)
+    return txt
 
-
-def Text_ini_file2():
+def params_upsilon():
         txt = """
 param[LRGa] = 1.8 1 2.5 0.02 0.02
-param[LRGb] = 0 0 0 0 0
-#param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
-param[logA] = 3.076 2.8 3.2 0.05 0.05
+#param[LRGb] = 0 0 0 0 0
+param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
+param[logA] = 3.076 2.8 3.3 0.01 0.01
 #param[logA] = 3.076 3.076 3.076 0 0 
-
-use_upsilon= 98
-samples = 10000000"""
+\n\n"""
 	return txt
 
 
 
-def params_cosmo(params):
-   if 'params_sim' in params:
+def params_cosmo(data_type):
+   if 'sim' in data_type:
 	txt = """
 #Omega_m = 0.292, Omega_b h^2 = 0.022, h=0.69.
 param[omegabh2] = 0.022 0.022 0.022 0 0
@@ -210,8 +219,6 @@ param[theta] = 1.040042 1.040042 1.040042 0 0
 param[ns] = 0.96 0.96 0.96 0 0"""
 	
    return txt
-
-
 
 
 

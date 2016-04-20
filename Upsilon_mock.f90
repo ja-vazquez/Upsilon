@@ -145,10 +145,11 @@ integer, parameter  :: numr= 304  !Stop there
           x(3) =   CMB%InitPower(1)        ! n_s
           x(4) =   CMB%H0
           x(5) = -1.000                     ! w
-          x(6) =  CMB%hola*Theory%sigma_8            ! sigma8
-          x(7) = 0.0 !z_gg                      ! redshift
+          x(6) =  Theory%sigma_8            ! sigma8
+          x(7) =  0.0                       ! redshift, z_gg
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        
+       
          !print *, CMB%H0, CMB%omdmh2 + CMB%ombh2, CMB%omnuh2
          !print *, Theory%sigma_8 
           call emu(x,y,t)
@@ -199,7 +200,9 @@ integer, parameter  :: numr= 304  !Stop there
        !-----------
 
         !Check this number, for mocks should be one
-       rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
+       !rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
+       rhobar =  0.01*CMB%hola
+       !print *, 'rhobar',rhobar !, CMB%hola 
 
        s8       = Theory%sigma_8
        upscalib = CMB%upscalib

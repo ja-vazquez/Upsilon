@@ -3,29 +3,32 @@
 import numpy as np
 from Useful_data import *
 
-data_type = 'lowz'			#sim, mocks,lowz
-jackknife  = False #True
-njacks     = 1 #100
+
+data_type = 'mocks'			    #sim, mocks,lowz
+jackknife  = False              #True
+
 
         #select type of file to anlayze
-bin_type, redzz, dir = file_choice(data_type)
+Ud = Useful_data()
+bin_type, redzz, dir = Ud.file_choice(data_type)
+njacks = 100 if jackknife else 1
 
 #------------------------------------------
 
-file_dir  = 'sim_files/lowz_clustering_lensing/'+dir
-dir_out   = 'sim_reshaped/'
+file_dir  = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/' #'sim_files/lowz_clustering_lensing/'+dir
+dir_out   = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/reshaped/'   #'sim_reshaped/'
 name_gg   = '_upsgg_cov.dat'
 name_gm   = '_upsgm_cov.dat'
 
 
-lnum  =  R0_files()
+lnum  =  Ud.R0_files()
 first_point, last_point = 1 , 70	#select the range of points
 fline = 1				#skip first line
 
 #---------------------------------------------
 
 for i in range(njacks):
- 
+
  name_ups  = '_ups.dat'
  name_cov  = '_cov.dat'
  if jackknife:
@@ -33,36 +36,36 @@ for i in range(njacks):
     name_cov = '_jk%i'%(i) + name_cov
 
  for redz in redzz:			 #select the file's name
-   file_name = files_name(data_type, bin_type, redz)
+   file_name = Ud.files_name(data_type, bin_type, redz)
 
-   for num in lnum: 
+   for num in lnum:
        fdata    = open(file_dir + file_name + str(num) + name_ups)
        file_read = fdata.readlines()
-    
+
        rp, ups_gg, ups_gm = [], [], []
-  
-       for l, _ in enumerate(file_read): 
-	  vals = file_read[l].split()
-	  if vals[0] != '#':
-	      if (float(vals[0]) < last_point and float(vals[0]) > first_point): 
-		  rp.append(vals[0])
-		  ups_gg.append(vals[1])
-		  ups_gm.append(vals[3])
+
+       for l, _ in enumerate(file_read):
+            vals = file_read[l].split()
+            if vals[0] != '#':
+                if (float(vals[0]) < last_point and float(vals[0]) > first_point):
+                    rp.append(vals[0])
+                    ups_gg.append(vals[1])
+                    ups_gm.append(vals[3])
        lups =  len(ups_gg)
        fdata.close()
 
-       i = 0	
-     	#new Format file
+       i = 0
+        #new Format file
        with open(dir_out  + file_name + str(num) + name_ups, 'w') as f:
           for l in range(fline, lups ):
-   	      f.write(str(rp[l] + '\t' + ups_gg[l] + '\n'))
+            f.write(str(rp[l] + '\t' + ups_gg[l] + '\n'))
           for l in range(fline, lups ):
-	      f.write(str(rp[l] + '\t' + ups_gm[l] + '\n'))		     	
-	      i += 1
+            f.write(str(rp[l] + '\t' + ups_gm[l] + '\n'))
+            i += 1
        print redz, 'R0', num, 'len_file',i*2
 
 
-     	# New cov matrix
+        # New cov matrix
        table1 = np.loadtxt(file_dir + file_name + str(num) + name_gg)
        table2 = np.loadtxt(file_dir + file_name + str(num) + name_gm)
 
