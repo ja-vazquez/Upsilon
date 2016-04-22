@@ -192,7 +192,7 @@ class Ini_file:
 
 if __name__=='__main__':
 
-    mocks = False
+    mocks = True
     if mocks:
        data_type = 'mocks'
        bin_type ='rebin1'
@@ -208,8 +208,8 @@ if __name__=='__main__':
 	    R0, nR0 = R0_points  
             if True:
 		print R0_points 
-        	#Ini.write_ini(R0, nR0)
-        	#Ini.write_wq(R0, run_wq=True, nodes=15)
-		Ini.write_dist(R0, run_dist=True)
-        	Ini.write_bf(R0, run_bf=True)
-        	Ini.plot_bf(R0)
+        	Ini.write_ini(R0, nR0)
+        	Ini.write_wq(R0, run_wq=True, nodes=15)
+		#Ini.write_dist(R0, run_dist=True)
+        	#Ini.write_bf(R0, run_bf=True)
+        	#Ini.plot_bf(R0)
