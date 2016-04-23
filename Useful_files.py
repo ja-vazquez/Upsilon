@@ -8,7 +8,7 @@ def chain_dir(data_type):
     if 'sim' in data_type:
 	dir += 'Sim_jk_b2/'
     elif 'mocks' in data_type:
-        dir += 'Mocks/'
+        dir += 'Mocks_diag/'
     elif 'lowz' in data_type:
         dir += 'Lowz/'
     return dir
@@ -47,7 +47,7 @@ def z_mean(data_type, redz):
     elif 'sim' in data_type:
         return redz
     else:
-        return '0.28'
+        return '0.267'
 
 
 
@@ -146,13 +146,13 @@ dragging_steps  = 5
 propose_scale = 2
 
 #If zero set automatically
-num_threads = 3
+num_threads = 1
 
 indep_sample=0
 
 use_clik= F
 #MCMC = 0, JK =2
-action = 0
+action = 2
 
 #these are just small speedups for testing
 get_sigma8=T
@@ -192,7 +192,7 @@ def params_upsilon():
 param[LRGa] = 1.8 1 2.5 0.02 0.02
 #param[LRGb] = 0 0 0 0 0
 param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
-param[logA] = 3.076 2.8 3.3 0.01 0.01
+param[logA] = 3.076 2.5 3.4 0.01 0.01
 #param[logA] = 3.076 3.076 3.076 0 0 
 \n\n"""
 	return txt

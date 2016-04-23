@@ -25,7 +25,7 @@ class Ini_file:
         self.name_cov   = '_cov.dat'
         self.name_dist  = 'distparams'
 
-        self.aver       =  1.0
+        self.aver       =  0.0
 
 
 
@@ -49,7 +49,7 @@ class Ini_file:
             f.write('z_gm     = %s   \n'%(z_mean(self.data_type, self.redz)))
 
             f.write(R0_params(R0, nR0) + '\n')
-            f.write('use_diag = %s\n\n'%('F' if 'rebin' in self.bin_type else 'T'))
+            f.write('use_diag = %s\n\n'%('T' if 'rebin' in self.bin_type else 'T'))
 
             f.write('file_root = ' + self.dir_chains + full_name + self.name_root + '\n')
             f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
@@ -91,9 +91,9 @@ class Ini_file:
             f.write('z_gm     = %s   \n'%(z_mean(self.data_type, self.redz)))
 
             f.write(R0_params(R0, nR0) + '\n')
-            f.write('use_diag = %s\n\n'%('F' if 'rebin' in self.bin_type else 'T'))
+            f.write('use_diag = %s\n\n'%('T' if 'rebin' in self.bin_type else 'T'))
 
-            f.write('file_root = ' + self.dir_chains + full_name + self.name_root + '\n')
+            f.write('file_root = ' + self.dir_chains + 'bf_'+ full_name + self.name_root + '\n')
             f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
             f.write('mock_cov  = ' + self.dir_data   + full_name + self.name_cov  + '\n')
 
@@ -192,11 +192,11 @@ class Ini_file:
 
 if __name__=='__main__':
 
-    mocks = True
+    mocks = False
     if mocks:
        data_type = 'mocks'
        bin_type ='rebin1'
-       redzz = ['singlesnap','allsnap', 'evol']
+       redzz = ['singlesnap','allsnap', 'evol'] #'singlesnap',
     else:
        data_type = 'lowz'
        bin_type = 'log1_rebin'
@@ -209,7 +209,7 @@ if __name__=='__main__':
             if True:
 		print R0_points 
         	Ini.write_ini(R0, nR0)
-        	Ini.write_wq(R0, run_wq=True, nodes=15)
+        	Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
 		#Ini.write_dist(R0, run_dist=True)
         	#Ini.write_bf(R0, run_bf=True)
         	#Ini.plot_bf(R0)

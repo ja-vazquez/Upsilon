@@ -146,7 +146,7 @@ integer, parameter  :: numr= 304  !Stop there
           x(4) =   CMB%H0
           x(5) = -1.000                     ! w
           x(6) =  Theory%sigma_8            ! sigma8
-          x(7) =  0.0                       ! redshift, z_gg
+          x(7) =  z_gg                       ! redshift, z_gg
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        
        
@@ -200,8 +200,8 @@ integer, parameter  :: numr= 304  !Stop there
        !-----------
 
         !Check this number, for mocks should be one
-       !rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
-       rhobar =  0.01*CMB%hola
+       rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
+       !rhobar =  CMB%hola*0.01
        !print *, 'rhobar',rhobar !, CMB%hola 
 
        s8       = Theory%sigma_8
