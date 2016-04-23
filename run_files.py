@@ -1,6 +1,8 @@
 # only select between lin or log
 import os, sys, time
 from Useful_files import *
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class Ini_file:
@@ -57,8 +59,6 @@ class Ini_file:
 
 
 
-
-
     def write_bf(self, R0, run_bf=False):
         import pandas as pd
         full_name = '%s%i'%(self.fname, R0)
@@ -71,7 +71,7 @@ class Ini_file:
 
         lines   =  pd.read_csv(file_bf, names= names, sep='\s+', skiprows=[0,1,2], index_col='param')
         print lines
-	b1_bf   =  lines.ix['LRGa']['mean']
+        b1_bf   =  lines.ix['LRGa']['mean']
         b2_bf   =  lines.ix['LRGb']['mean']
         lna_bf  =  lines.ix['logA']['mean']
 
@@ -186,13 +186,59 @@ class Ini_file:
             time.sleep(1.)
 
 
+    def write_chisq(self, R0):
+        full_name = '%s%i'%(self.fname, R0)
+        file_chisq = self.dir_stats + full_name + self.name_root + '.minimum'
 
+        with open(file_chisq, 'rb') as f:
+            for line in f:
+                if 'chi-sq    =' in line:
+                    best_fit_line = line
+
+
+        bf = float(best_fit_line.strip().split('=')[-1])
+
+        with open('chisq_' + self.fname + '.dat', 'a') as f:
+            f.write('%i \t %f \n'%(R0, bf))
+
+
+
+
+
+class Chisq:
+    def __init__(self, data_type, bin_type, redzz):
+        self.data_type= data_type
+        self.bin_type = bin_type
+        self.redzz     = redzz
+
+    def plot_chisq(self):
+        import pandas as pd
+        chisq_all, R0_all =[], []
+        for redz in self.redzz:
+            Ini = Ini_file(self.data_type, self.bin_type, redz)
+            file_name = 'chisq_' + Ini.fname + '.dat'
+            lines   =  pd.read_csv(file_name, names= ['R0', 'chisq'], sep='\s+')
+
+            chisq_all.append(lines['chisq'])
+            R0_all.append(lines['R0'])
+
+        fig = plt.figure(figsize=(15,6))
+        ax = fig.add_subplot(1,1,1)
+        for i, k in enumerate(self.redzz):
+            ax.plot(R0_all[i], chisq_all[i]/(1), label = k)
+        plt.xlabel('R0')
+        plt.ylabel('Chisq')
+        plt.title('chi-sq')
+        plt.legend(loc="upper right")
+        plt.grid()
+        plt.xlim([1,11])
+        plt.savefig("chisq.pdf")
+        plt.show()
 
 
 
 if __name__=='__main__':
-
-    mocks = True
+    mocks = False
     if mocks:
        data_type = 'mocks'
        bin_type ='rebin1'
@@ -203,13 +249,17 @@ if __name__=='__main__':
        redzz = ['lowz']
 
     for redz in redzz:
-    	Ini = Ini_file(data_type, bin_type, redz)
-    	for R0_points in Ini.R0_points:
-	    R0, nR0 = R0_points  
+        Ini = Ini_file(data_type, bin_type, redz)
+        for R0_points in Ini.R0_points:
+            R0, nR0 = R0_points
             if True:
-		print R0_points 
-        	Ini.write_ini(R0, nR0)
-        	Ini.write_wq(R0, run_wq=True, nodes=15)
-		#Ini.write_dist(R0, run_dist=True)
-        	#Ini.write_bf(R0, run_bf=True)
-        	#Ini.plot_bf(R0)
+                #print R0_points
+                Ini.write_chisq(R0)
+                #Ini.write_ini(R0, nR0)
+                #Ini.write_wq(R0, run_wq=True, nodes=15)
+                #Ini.write_dist(R0, run_dist=True)
+        	    #Ini.write_bf(R0, run_bf=True)
+        	    #Ini.plot_bf(R0)
+
+    chi = Chisq(data_type, bin_type, redzz)
+    chi.plot_chisq()
