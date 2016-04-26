@@ -61,7 +61,7 @@ type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl
 type(CSpline) :: PkSpl, PkABSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
                                 
-real, parameter :: zdatafid = 0.23, maxrgg=150.0, maxrgm=150.0 
+real, parameter :: zdatafid = 0.23, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
 !be the actual redshift of simulations. 
 real, parameter :: finalcor =0.00
 integer, parameter :: MAXNP=200
@@ -141,12 +141,12 @@ integer, parameter  :: numr= 304  !Stop there
        if (use_coyote) then 
           print *,'Using Coyote emulator'
           x(1) =   CMB%ombh2               ! omega_b 
-          x(2) =   CMB%omdmh2 + CMB%ombh2  ! omega_m
+          x(2) =   CMB%omdmh2+ CMB%ombh2  ! omega_m
           x(3) =   CMB%InitPower(1)        ! n_s
           x(4) =   CMB%H0
           x(5) = -1.000                     ! w
           x(6) =  Theory%sigma_8            ! sigma8
-          x(7) =  z_gg                       ! redshift, z_gg
+          x(7) =  0.0 !z_gg                       ! redshift, z_gg
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        
        
@@ -173,8 +173,8 @@ integer, parameter  :: numr= 304  !Stop there
 
        call PkkSpl%init(k_lin, pk_lin)
 
-       minr = 2.0  
-       maxr = 150.0
+       minr = 1.5 !2.0  
+       maxr = 120 !150.0
 
        do ii = 1, NR
           xirr(ii) = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
@@ -200,8 +200,8 @@ integer, parameter  :: numr= 304  !Stop there
        !-----------
 
         !Check this number, for mocks should be one
-       rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
-       !rhobar =  CMB%hola*0.01
+       !rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
+       rhobar =  CMB%hola*0.01
        !print *, 'rhobar',rhobar !, CMB%hola 
 
        s8       = Theory%sigma_8
@@ -281,7 +281,7 @@ integer, parameter  :: numr= 304  !Stop there
           biaspp = D%biaspp
           bfuncselector = D%bselector
                
-          if (use_coyote) then
+          if (use_XiAB) then
              gfactgg= 1. 
              gfactgm= 1. 
 
@@ -296,8 +296,8 @@ integer, parameter  :: numr= 304  !Stop there
           end if
 
 
-          minr = 2.0     
-          maxr = 150.0   
+          minr = 1.5 !2.0     
+          maxr = 120. !150.0   
 
           do ii=1,NR
              rad      = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
@@ -339,7 +339,7 @@ integer, parameter  :: numr= 304  !Stop there
           call GetGG%init(xirr, thgg)
           call GetGM%init(xirr, thgm)
 
-          factor = rhobar*(1.0+upscalib*D%calibamp)*D%calibcor
+          factor = 1.0 !rhobar*(1.0+upscalib*D%calibamp)*D%calibcor
 
           do ii=1,D%NP
              rad = D%rra(ii)
