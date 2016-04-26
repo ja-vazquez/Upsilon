@@ -60,8 +60,6 @@ class Ini_file:
 
 
     def write_bf(self, R0, run_bf=False):
-        import pandas as pd
-        full_name = '%s%i'%(self.fname, R0)
 
         file_bf = self.dir_stats + full_name + self.name_root + '.likestats'
         names   = ['param','bestfit','lower1',
@@ -112,8 +110,8 @@ class Ini_file:
 	
         names = ['r', 'obs', 'sig', 'theo']
         lines = pd.read_table(full_name, names=names, sep='\s+')
-	split_lines = []
-  	for nm in names:
+        split_lines = []
+        for nm in names:
            split_lines.append(np.array_split(lines[nm], 2))
 
         fig = plt.figure(figsize=(15,6))
@@ -253,7 +251,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points
             if True: 
-		#print R0_points
+                #print R0_points
                 Ini.write_chisq(R0)
                 #Ini.write_ini(R0, nR0)
                 #Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
