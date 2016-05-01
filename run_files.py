@@ -51,7 +51,7 @@ class Ini_file:
             f.write('z_gm     = %s   \n'%(z_mean(self.data_type, self.redz)))
 
             f.write(R0_params(R0, nR0) + '\n')
-            f.write('use_diag = %s\n\n'%('T' if 'rebin' in self.bin_type else 'T'))
+            f.write('use_diag = %s\n\n'%('F' if 'rebin' in self.bin_type else 'T'))
 
             f.write('file_root = ' + self.dir_chains + full_name + self.name_root + '\n')
             f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
@@ -61,20 +61,17 @@ class Ini_file:
 
     def write_bf(self, R0, run_bf=False):
 
-        full_name = '%s%i'%(self.fname, R0)
-        file_bf = self.dir_stats + full_name + self.name_root + '.margestats'
+        file_bf = self.dir_stats + full_name + self.name_root + '.likestats'
+        names   = ['param','bestfit','lower1',
+                   'upper1','lower2','upper2','name','other']
+	#names   = ['param', 'mean', 'sddev', 'lowe1', 'upper1','limit1',
+	#	 'lower2','upper2','limit2','name','other'] 	
 
-        #names   = ['param','bestfit','lower1',
-        #           'upper1','lower2','upper2','name','other']
-
-        names   = ['param', 'mean', 'sddev', 'lowe1', 'upper1','limit1',
-	     'lower2','upper2','limit2','name','other']
-
-        lines   =  pd.read_csv(file_bf, names= names, sep='\s+', skiprows=[0,1,2], index_col='param')
+        lines   =  pd.read_csv(file_bf, names= names, sep='\s+', skiprows=[0,1], index_col='name')
         print lines
-        b1_bf   =  lines.ix['LRGa']['mean']
-        b2_bf   =  lines.ix['LRGb']['mean']
-        lna_bf  =  lines.ix['logA']['mean']
+        b1_bf   =  float(lines.ix['bias_1']['bestfit'])
+        b2_bf   =  float(lines.ix['bias_2']['bestfit'])
+        lna_bf  =  float(lines.ix['{\\rm{ln}}(10^{10}']['bestfit'])
 
         with open('bf_INI_%s.ini'%(full_name), 'w') as f:
             f.write('param[LRGa] = %2.3f %2.3f %2.3f 0.001 0.001\n'%(b1_bf, b1_bf-0.001, b1_bf+0.001))
@@ -92,7 +89,7 @@ class Ini_file:
             f.write('z_gm     = %s   \n'%(z_mean(self.data_type, self.redz)))
 
             f.write(R0_params(R0, nR0) + '\n')
-            f.write('use_diag = %s\n\n'%('T' if 'rebin' in self.bin_type else 'T'))
+            f.write('use_diag = %s\n\n'%('F' if 'rebin' in self.bin_type else 'T'))
 
             f.write('file_root = ' + self.dir_chains + 'bf_'+ full_name + self.name_root + '\n')
             f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
@@ -243,7 +240,7 @@ if __name__=='__main__':
     if mocks:
        data_type = 'mocks'
        bin_type ='rebin1'
-       redzz = ['singlesnap','allsnap', 'evol'] #'singlesnap',
+       redzz = ['singlesnap'] #,'allsnap', 'evol'] #'singlesnap',
     else:
        data_type = 'lowz'
        bin_type = 'log1_rebin'
@@ -255,12 +252,12 @@ if __name__=='__main__':
             R0, nR0 = R0_points
             if True: 
                 #print R0_points
-                Ini.write_chisq(R0)
-                #Ini.write_ini(R0, nR0)
-                #Ini.write_wq(R0, run_wq=True, nodes=15)
+                #Ini.write_chisq(R0)
+                Ini.write_ini(R0, nR0)
+                #Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
                 #Ini.write_dist(R0, run_dist=True)
         	#Ini.write_bf(R0, run_bf=True)
         	#Ini.plot_bf(R0)
 
-    chi = Chisq(data_type, bin_type, redzz)
-    chi.plot_chisq()
+    #chi = Chisq(data_type, bin_type, redzz)
+    #chi.plot_chisq()

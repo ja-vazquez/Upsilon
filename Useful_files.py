@@ -8,7 +8,7 @@ def chain_dir(data_type):
     if 'sim' in data_type:
 	dir += 'Sim_jk_b2/'
     elif 'mocks' in data_type:
-        dir += 'Mocks_diag/'
+        dir += 'Mocks/'
     elif 'lowz' in data_type:
         dir += 'Lowz/'
     return dir
@@ -164,7 +164,7 @@ get_sigma8=T
 
 #-------------------------------------##
 
-#not used now (both)
+#none of the used for now 
 use_Ups = T
 use_mock = T
 
@@ -191,8 +191,8 @@ def params_upsilon():
         txt = """
 param[LRGa] = 1.8 1 2.5 0.02 0.02
 #param[LRGb] = 0 0 0 0 0
-param[LRGb] = 0.2 -2.5 2.5 0.05 0.05
-param[logA] = 3.076 2.5 3.4 0.01 0.01
+param[LRGb] = 0.2 -2.5 2.5 0.01 0.01
+param[logA] = 3.076 2.5 3.4 0.02 0.02
 #param[logA] = 3.076 3.076 3.076 0 0 
 \n\n"""
 	return txt
