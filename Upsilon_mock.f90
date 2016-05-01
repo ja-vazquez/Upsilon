@@ -61,7 +61,7 @@ type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl
 type(CSpline) :: PkSpl, PkABSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
                                 
-real, parameter :: zdatafid = 0.23, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
+real, parameter :: zdatafid = 0.27, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
 !be the actual redshift of simulations. 
 real, parameter :: finalcor =0.00
 integer, parameter :: MAXNP=200
@@ -144,9 +144,9 @@ integer, parameter  :: numr= 304  !Stop there
           x(2) =   CMB%omdmh2+ CMB%ombh2  ! omega_m
           x(3) =   CMB%InitPower(1)        ! n_s
           x(4) =   CMB%H0
-          x(5) = -1.000                     ! w
-          x(6) =  Theory%sigma_8            ! sigma8
-          x(7) =  0.0 !z_gg                       ! redshift, z_gg
+          x(5) =   -1.000                     ! w
+          x(6) =   Theory%sigma_8            ! sigma8
+          x(7) =   z_gg                       ! redshift, z_gg
    
           t(1) = 2                          ! 1= D^2, 2= P(k)        
        
@@ -154,7 +154,7 @@ integer, parameter  :: numr= 304  !Stop there
          !print *, Theory%sigma_8 
           call emu(x,y,t)
 
-          h0 = CMB%H0/100.0
+          h0 = 67.77/100. !CMB%H0/100.0
           do ii=1, nn
              new_k(ii)  = y(ii)/h0
              new_pk(ii) = y(ii+ nn)*h0**3.0
