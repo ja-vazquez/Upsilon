@@ -19,7 +19,7 @@ class Ini_file:
 
         self.dir_chains = chain_dir(data_type)
         self.dir_data   = 'lrgdata-final/mocks_lrg/sim_reshaped/'
-        self.dir_stats  = 'stats/'
+        self.dir_stats  = 'stats_all/'
         self.dir_bf     = 'bestfit/'
 
         self.name_root  = '_ups'
@@ -229,7 +229,7 @@ class Chisq:
             ax.plot(R0_all[i], chisq_all[i]/(1), label = k)
         plt.xlabel('R0')
         plt.ylabel('Chisq')
-        plt.title('chi-sq')
+        plt.title('chi-sq - Full covariance matrix')
         plt.legend(loc="upper right")
         plt.grid()
         plt.xlim([1,11])
@@ -239,7 +239,7 @@ class Chisq:
 
 
 if __name__=='__main__':
-    mocks = False
+    mocks = True
     if mocks:
        data_type = 'mocks'
        bin_type ='rebin1'
