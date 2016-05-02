@@ -58,15 +58,15 @@ type(UpsilonData), pointer :: Dcur
 type(CSpline) :: thc_Fid, thc_ns, thc_s8p, thc_s8m, thc_oml,thc_omh,thc_ah,thc_al, thc_h0l, thc_h0h
 type(CSpline) :: GalPtA, GalPtB
 type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl_4
-type(CSpline) :: PkSpl, PkABSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
+type(CSpline) :: PkSpl, PkASpl, PkBSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
                                 
-real, parameter :: zdatafid = 0.27, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
+real, parameter :: zdatafid = 0.23, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
 !be the actual redshift of simulations. 
 real, parameter :: finalcor =0.00
 integer, parameter :: MAXNP=200
 real*8 :: pi_ = 4*ATAN(1d0)
-real*8, parameter :: alnkmin=log(1d-3), alnkmax=log(10d0), alnkmin2=log(1d-3), alnkmax2=log(10d0)
+real*8, parameter :: alnkmin=log(1d-3), alnkmax=log(10d0), alnkmin2=log(1d-4), alnkmax2=log(20d0)
 real :: bestchi2=1e30
 real :: deltabiasp
 
@@ -129,7 +129,7 @@ integer, parameter  :: numr= 304  !Stop there
 
        real*8 ru(numr), fftlog(numr) 
 
-       integer, parameter  :: nq = 70
+       integer, parameter  :: nq = 20
        real, dimension (nq):: new_q, new_pq, new_Pkk
 
        if (virgin.and.use_upsilon<101) then
@@ -154,7 +154,7 @@ integer, parameter  :: numr= 304  !Stop there
          !print *, Theory%sigma_8 
           call emu(x,y,t)
 
-          h0 = 67.77/100. !CMB%H0/100.0
+          h0 = CMB%H0/100.0
           do ii=1, nn
              new_k(ii)  = y(ii)/h0
              new_pk(ii) = y(ii+ nn)*h0**3.0
@@ -179,7 +179,7 @@ integer, parameter  :: numr= 304  !Stop there
        do ii = 1, NR
           xirr(ii) = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
           xilin(ii) =  Xi(DBLE(xirr(ii)), CMB,Theory, zdatafid*1.0_dl, 0.d0)
-          xi2lin(ii) = (xilin(ii))**2.
+          xi2lin(ii) = (FFTSpl%eval(real(xirr(ii))))**2!(xilin(ii))**2.
        end do
 
        call XilinSpl%init(xirr, xilin)
@@ -192,8 +192,12 @@ integer, parameter  :: numr= 304  !Stop there
              new_pq(ki) =  Pk_AB(DBLE(new_q(ki)), zdatafid*1.0_dl)
           end do
 
-          call PkABSpl%init(REAL(new_q), REAL(new_pq))
+          call PkASpl%init(REAL(new_q), REAL(new_pq))
           call IniFFT(ru, fftlog, CMB,Theory, zdatafid*1.0_dl, 1)
+          call Xi_ASpl%init(REAL(ru), REAL(fftlog))
+
+          call PkASpl%init(REAL(new_q), REAL(new_pq))
+          call IniFFT(ru, fftlog, CMB,Theory, zdatafid*1.0_dl, 2)
           call Xi_ASpl%init(REAL(ru), REAL(fftlog))
        end if
 
@@ -240,11 +244,12 @@ integer, parameter  :: numr= 304  !Stop there
               end do
             close(51)
 
+
             if (use_XiAB) then  
              open (52,file='test_Xi_A.dat')
                do ii = 1, NR
                   rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
-                  write (52,'(3G)'),  rad, Xi_ASpl%eval(real(rad)), Xi_BSpl%eval(real(rad))
+                  write (52,'(3G)'), rad, Xi_ASpl%eval(real(rad)),Xi_BSpl%eval(real(rad))                
                end do
              close(52)     
             end if 
@@ -262,7 +267,7 @@ integer, parameter  :: numr= 304  !Stop there
 
        print *, 'nsets -> ',chi2c
        print *, 'chi2 before calibration', chi2
-       chi2 = chi2 + (upscalib**2)/1.**2 !! unit calibration error
+       chi2 = chi2 !+ (upscalib**2)/1.**2 !! unit calibration error
 
        UpsilonLike = (chi2)/2.0  !! no minus is cosmomc.
 
@@ -280,19 +285,25 @@ integer, parameter  :: numr= 304  !Stop there
           biasp  = D%biasp
           biaspp = D%biaspp
           bfuncselector = D%bselector
-               
-          if (use_XiAB) then
-             gfactgg= 1. 
-             gfactgm= 1. 
+             
 
+ 
+          if (use_coyote) then
+             gfactgg= 1.
+             gfactgm= 1.
+          else
+             gfactgg=MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
+             gfactgm=MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
+          end if
+ 
+
+          if (use_XiAB) then
              gfactgg0= 1. 
              gfactgm0= 1. 
           else
-             gfactgg= MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
-             gfactgm= MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
-
              gfactgg0= MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
              gfactgm0= MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
+print *, (s8/0.8)**4 * gfactgg0**2, (s8/0.8)**4 * gfactgm0**2
           end if
 
 
@@ -359,6 +370,16 @@ integer, parameter  :: numr= 304  !Stop there
                close(53)
             end if
 
+            if (use_upsilon .eq. 99 .and. not (use_XiAB)) then
+             open (53,file='test_Tobias_XA.dat')
+                do ii = 1, NR
+                  rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
+                  write (53,'(3G)'),  rad, GalPtA%eval(rad)*(s8/0.8)**4 *gfactgg0**2, GalPtB%eval(rad)*(s8/0.8)**4 * gfactgg0**2
+                end do
+             close(53)
+            end if
+
+
 
           diff(1:D%NP) = theo(1:D%NP) - D%dsups
           chx2 = DOT_PRODUCT(diff(1:D%NP),MATMUL(D%icov,diff(1:D%NP)))
@@ -376,14 +397,14 @@ integer, parameter  :: numr= 304  !Stop there
             xi_A = Xi_ASpl%eval(tr)
             xi_B = Xi_BSpl%eval(tr)
           else
-            xi_A = GalPtA%eval(tr)*(s8/0.8)**4
-            xi_B = GalPtB%eval(tr)*(s8/0.8)**4
+            xi_A = GalPtA%eval(tr)*(s8/0.8)**4 * gfactgg0**2
+            xi_B = GalPtB%eval(tr)*(s8/0.8)**4 * gfactgg0**2
           end if
 
             ! We should fix b_hh to b_hm+0.2
-          b2= biasp+deltabiasp
+          b2= biasp !+deltabiasp
             ! if (tr>3.96 .and.tr<4) write(*,'(10G)') tr, xi, bias, s8, xi*bias**2 
-          dsggfunc = xi * bias**2 + 2*bias*b2*gfactgg0**2*xi_A + b2**2*gfactgg0**2 * xi_B
+          dsggfunc = xi * bias**2 + 2*bias*b2*xi_A + b2**2 * xi_B
        end function dsggfunc
 
 
@@ -396,12 +417,12 @@ integer, parameter  :: numr= 304  !Stop there
           if (use_XiAB) then
             xi_A = Xi_ASpl%eval(tr)
           else        
-            xi_A = GalPtA%eval(tr)*(s8/0.8)**4
+            xi_A = GalPtA%eval(tr)*(s8/0.8)**4 * gfactgm0**2 
           end if
 
             !!    write (66,*) tr, bias , 1/xi*(biasp * gfactgm0**2 * GalPtA%eval(tr) *(s8/0.8)**4) 
             !! gfactgm is the growth factor squared
-          dsgmfunc = xi * bias + biasp * gfactgm0**2 * xi_A
+          dsgmfunc = xi * bias + biasp * xi_A
        end function dsgmfunc
 
     end function Ups_LnLike
@@ -579,7 +600,7 @@ integer, parameter  :: numr= 304  !Stop there
         real(dl) kdiff_min, kdiff_max
         real*8, external :: rombint
         
-        Int_q = rombint (xifunc, alnkmin2 , alnkmax2 , 1d-2)/(2*pi_**2) !1d-3 use this
+        Int_q = rombint (xifunc, alnkmin2 , alnkmax2 , 1d-3)/(4*pi_**2) !1d-3 use this
                                               
         contains
         real*8 function xifunc (alnq)
@@ -589,10 +610,10 @@ integer, parameter  :: numr= 304  !Stop there
                 kmq  = k*u -q
                 k_in = k**2 + q**2 - 2.0*k*q*u
  
-                 if (sqrt(k_in) < exp(0.5*alnkmin2) .or. sqrt(k_in)> exp(alnkmax2*0.5)) then
+                 if (sqrt(k_in) < exp(0.5*alnkmin2) .or. sqrt(k_in)> exp(alnkmax2*0.5) .or. k_in ==0) then
                      pow = 0
                  else
-                     F2  = 5./7. + kmq*(0.5d0*k**2 - 5*q*kmq/7.)/(q*k_in) 
+                     F2  = 1.0 ! 5./7. + kmq*(0.5d0*k**2 - 5*q*kmq/7.)/(q*k_in) 
                      pow = PkkSpl%eval(real(sqrt(k_in)))*F2*PkkSpl%eval(real(q))
                  end if
 
@@ -765,17 +786,17 @@ integer, parameter  :: numr= 304  !Stop there
       dlogr=(logrmax-logrmin)/n
       dlnr=dlogr*log(10.d0)
 
-      kx(1)     = log10(1d-4) !log10(1d-6) !-5 
+      kx(1)     = log10(1d-5) !log10(1d-6) !-5 
       !kx(2)     = log10(1d-3) !-4
       !kx(nnm-1) = log10(1d2)  !2
-      kx(nnm)   = log10(1d2) !log10(1d4)  !3
+      kx(nnm)   = log10(1d3) !log10(1d4)  !3
       Pkk(1)    = 0  
       !Pkk(2)    = 0
       !Pkk(nnm-1)= 0  
-      !Pkk(nnm)  = 0     
+      Pkk(nnm)  = 0     
  
       do i = 2, nnm -1 !3,nnm-2
-!        if (what.eq.0) then
+        if (what.eq.0) then
           kk(i)  = exp(alnkmin+(i-2.0)*(alnkmax-alnkmin)/(nnm-3.0)) ! -3, -5
 !          if(upsilon_option.eq.3) then
 !             Pkk(i) = PkkSpl%eval(real(kk(i)))
@@ -784,10 +805,10 @@ integer, parameter  :: numr= 304  !Stop there
 !             Pkk(i) = MatterPowerat_Z(Theory,DBLE(kk(i)),zdatafid*1.0_dl)
 !print *, kk(i), Pkk(i), CoyoSpl%eval(real(kk(i)))
 !          end if
-!        else                    
-!             kk(i)  = exp(alnkmin2 +(i-3)*(alnkmax2 - alnkmin2)/(nnm-5.0))
-!             Pkk(i) = PkABSpl%eval(real(kk(i))) 
-!        end if
+        else                    
+             kk(i)  = exp(alnkmin2 +(i-2.0)*(alnkmax2 - alnkmin2)/(nnm-3.0))
+             Pkk(i) = PkASpl%eval(real(kk(i))) 
+        end if
 
         kx(i)  = log10(kk(i))
       end do
