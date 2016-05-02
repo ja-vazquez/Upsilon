@@ -240,7 +240,7 @@ if __name__=='__main__':
     if mocks:
        data_type = 'mocks'
        bin_type ='rebin1'
-       redzz = ['evol'] #,'allsnap', 'evol'] #'singlesnap',
+       redzz = ['singlesnap'] #,'allsnap', 'evol'] #'singlesnap',
     else:
        data_type = 'lowz'
        bin_type = 'log1_rebin'
