@@ -61,12 +61,12 @@ type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl
 type(CSpline) :: PkSpl, PkASpl, PkBSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
                                 
-real, parameter :: zdatafid = 0.27, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
+real, parameter :: zdatafid = 0.23, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
 !be the actual redshift of simulations. 
 real, parameter :: finalcor =0.00
 integer, parameter :: MAXNP=200
 real*8 :: pi_ = 4*ATAN(1d0)
-real*8, parameter :: alnkmin=log(1d-3), alnkmax=log(10d0), alnkmin2=log(1d-4), alnkmax2=log(20d0)
+real*8, parameter :: alnkmin=log(1d-4), alnkmax=log(10d0), alnkmin2=log(1d-4), alnkmax2=log(20d0)
 real :: bestchi2=1e30
 real :: deltabiasp
 
@@ -159,14 +159,14 @@ integer, parameter  :: numr= 304  !Stop there
 
           enddo   
           call CoyoSpl%init(new_k, new_pk)
-          call IniFFT(ru, fftlog, CMB,Theory, zdatafid*1.0_dl, 0)
+          call IniFFT(ru, fftlog, CMB,Theory, 0)
           call FFTSpl%init(REAL(ru), REAL(fftlog))
        end if
 
         ! Linear Theory
        do ki = 1,nn
           k_lin(ki) = exp(alnkmin+(ki-1)*(alnkmax-alnkmin)/(nn-1.0))
-          pk_lin(ki) = MatterPowerat_Z(Theory,DBLE(k_lin(ki)),zdatafid*1.0_dl)
+          pk_lin(ki) = MatterPowerat_Z(Theory,DBLE(k_lin(ki)), z_gg*1.0_dl)
        end do
 
        call PkkSpl%init(k_lin, pk_lin)
@@ -176,29 +176,29 @@ integer, parameter  :: numr= 304  !Stop there
 
        do ii = 1, NR
           xirr(ii) = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
-          xilin(ii) =  Xi(DBLE(xirr(ii)), CMB,Theory, zdatafid*1.0_dl, 0.d0)
+          xilin(ii) =  Xi(DBLE(xirr(ii)), CMB,Theory, z_gg*1.0_dl, 0.d0)
           xi2lin(ii) = (xilin(ii))**2.
        end do
 
        call XilinSpl%init(xirr, xilin)
-       call Xi_BSpl%init(xirr, xi2lin) ! Check this number 2, same in A
+       call Xi_BSpl%init(xirr, xi2lin) 
 
         !Xi_AB
        if (use_XiAB) then
           do ki = 1, nq
              new_q(ki)  = exp(alnkmin2 +(ki-1)*(alnkmax2 - alnkmin2)/(nq-1.0))
-             new_pqa(ki) =  Pk_AB(DBLE(new_q(ki)), zdatafid*1.0_dl, 0)
-!             new_pqb(ki) =  Pk_AB(DBLE(new_q(ki)), zdatafid*1.0_dl, 1) 
+             new_pqa(ki) =  Pk_AB(DBLE(new_q(ki)), z_gg*1.0_dl, 0)
+             ! new_pqb(ki) =  Pk_AB(DBLE(new_q(ki)), z_gg*1.0_dl, 1) 
           end do
 
           call PkASpl%init(REAL(new_q), REAL(new_pqa))
-          call IniFFT(ru, fftlog, CMB,Theory, zdatafid*1.0_dl, 1)
-          call Xi_ASpl%init(REAL(ru), REAL(fftlog))  !Check thi number 2
+          call IniFFT(ru, fftlog, CMB,Theory, 1)
+          call Xi_ASpl%init(REAL(ru), REAL(fftlog))  
 
-! Double check that give same value with F2=1 and xi**@
-!          call PkASpl%init(REAL(new_q), REAL(new_pqb))
-!          call IniFFT(ru, fftlog, CMB,Theory, zdatafid*1.0_dl, 2)
-!          call Xi_BSpl%init(REAL(ru), REAL(fftlog))
+                ! Double check that give same value with F2=1 and xi**@
+          !call PkASpl%init(REAL(new_q), REAL(new_pqb))
+          !call IniFFT(ru, fftlog, CMB,Theory,  2)
+          !call Xi_BSpl%init(REAL(ru), REAL(fftlog))
        end if
 
        !-----------
@@ -246,7 +246,7 @@ integer, parameter  :: numr= 304  !Stop there
 
 
             if (use_XiAB) then  
-             open (52,file='test_Xi_Afid.dat')
+             open (52,file='test_Xi_Afid2.dat')
                do ii = 1, NR
                   rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
                   write (52,'(3G)'), rad, Xi_ASpl%eval(real(rad)),Xi_BSpl%eval(real(rad))                
@@ -406,7 +406,7 @@ integer, parameter  :: numr= 304  !Stop there
             ! We should fix b_hh to b_hm+0.2
           b2= biasp !+deltabiasp
             ! if (tr>3.96 .and.tr<4) write(*,'(10G)') tr, xi, bias, s8, xi*bias**2 
-          dsggfunc = xi * bias**2  +  2*bias*b2*xi_A  +  b2**2 * xi_B/2.0
+          dsggfunc = xi * bias**2  +  2*bias*b2*xi_A  +  b2**2 * xi_B
        end function dsggfunc
 
 
@@ -760,11 +760,10 @@ integer, parameter  :: numr= 304  !Stop there
     end function GetUpsilon
 
 
-    subroutine IniFFT(ru, fftlog, CMB, Theory, curz, what) 
+    subroutine IniFFT(ru, fftlog, CMB, Theory,  what) 
       implicit none   
       Type(TheoryPredictions) Theory
       Type (CMBParams) CMB
-      real(dl) curz
 
       integer NMAX
       logical ok
@@ -795,14 +794,14 @@ integer, parameter  :: numr= 304  !Stop there
       dlogr=(logrmax-logrmin)/n
       dlnr=dlogr*log(10.d0)
 
-      kx(1)     = log10(1d-5) !log10(1d-6) !-5 
-      kx(nnm)   = log10(1d3) !log10(1d4)  !3
+      kx(1)     = log10(1d-5)  
+      kx(nnm)   = log10(1d3) 
       Pkk(1)    = 0  
       Pkk(nnm)  = 0     
  
-      do i = 2, nnm -1 !3,nnm-2
+      do i = 2, nnm -1 
         if (what.eq.0) then
-          kk(i)  = exp(alnkmin+(i-2.0)*(alnkmax-alnkmin)/(nnm-3.0)) 
+             kk(i)  = exp(alnkmin+(i-2.0)*(alnkmax-alnkmin)/(nnm-3.0)) 
              Pkk(i) = CoyoSpl%eval(real(kk(i)))
         else  if (what.eq.1) then                  
              kk(i)  = exp(alnkmin2 +(i-2.0)*(alnkmax2 - alnkmin2)/(nnm-3.0))
@@ -814,10 +813,8 @@ integer, parameter  :: numr= 304  !Stop there
 
         kx(i)  = log10(kk(i))
       end do
-     
- 
-      call PkSpl%init(real(kx), real(Pkk))
-   
+      
+      call PkSpl%init(real(kx), real(Pkk))  
  
       do i=1,n 
          r   = 10.d0**(logrc+(i-nc)*dlogr)

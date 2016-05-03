@@ -146,7 +146,7 @@ dragging_steps  = 5
 propose_scale = 2
 
 #If zero set automatically
-num_threads = 1
+num_threads = 3
 
 indep_sample=0
 
@@ -192,7 +192,7 @@ def params_upsilon():
 param[LRGa] = 1.8 1 2.5 0.02 0.02
 #param[LRGb] = 0 0 0 0 0
 param[LRGb] = 0.2 -2.5 2.5 0.01 0.01
-param[logA] = 3.076 2.5 3.4 0.02 0.02
+param[logA] = 3.076 2.6 3.2 0.02 0.02
 #param[logA] = 3.076 3.076 3.076 0 0 
 \n\n"""
 	return txt

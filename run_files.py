@@ -19,7 +19,7 @@ class Ini_file:
 
         self.dir_chains = chain_dir(data_type)
         self.dir_data   = 'lrgdata-final/mocks_lrg/sim_reshaped/'
-        self.dir_stats  = 'stats_all/'
+        self.dir_stats  = 'stats/'
         self.dir_bf     = 'bestfit/'
 
         self.name_root  = '_ups'
@@ -60,7 +60,7 @@ class Ini_file:
 
 
     def write_bf(self, R0, run_bf=False):
-
+	full_name = '%s%i'%(self.fname, R0)
         file_bf = self.dir_stats + full_name + self.name_root + '.likestats'
         names   = ['param','bestfit','lower1',
                    'upper1','lower2','upper2','name','other']
@@ -133,7 +133,7 @@ class Ini_file:
         plt.legend(loc="upper right")
 
         plt.tight_layout()
-        plt.savefig(full_name.replace('.dat','') + ".pdf")
+        plt.savefig(full_name.replace('.dat','') + ".jpg")
         plt.show()
 
 
@@ -230,7 +230,7 @@ class Chisq:
         plt.legend(loc="upper right")
         plt.grid()
         plt.xlim([1,11])
-        plt.savefig("chisq.pdf")
+        plt.savefig("chisq.jpg")
         plt.show()
 
 
@@ -240,7 +240,7 @@ if __name__=='__main__':
     if mocks:
        data_type = 'mocks'
        bin_type ='rebin1'
-       redzz = ['singlesnap'] #,'allsnap', 'evol'] #'singlesnap',
+       redzz =  ['singlesnap','allsnap', 'evol'] #'singlesnap',
     else:
        data_type = 'lowz'
        bin_type = 'log1_rebin'
@@ -253,11 +253,11 @@ if __name__=='__main__':
             if True: 
                 #print R0_points
                 #Ini.write_chisq(R0)
-                Ini.write_ini(R0, nR0)
+                #Ini.write_ini(R0, nR0)
                 #Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
                 #Ini.write_dist(R0, run_dist=True)
         	#Ini.write_bf(R0, run_bf=True)
-        	#Ini.plot_bf(R0)
+        	Ini.plot_bf(R0)
 
     #chi = Chisq(data_type, bin_type, redzz)
     #chi.plot_chisq()
