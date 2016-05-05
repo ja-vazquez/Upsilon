@@ -72,3 +72,4 @@ extracted from the jacknives.
 
 see
 [Results](https://github.com/ja-vazquez/Upsilon/tree/master/Results)
+[Notebook](http://nbviewer.jupyter.org/github/ja-vazquez/Upsilon/blob/master/Upsilon_plots.ipynb)

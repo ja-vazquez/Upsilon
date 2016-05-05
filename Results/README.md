@@ -1,4 +1,3 @@
-[Results](http://nbviewer.jupyter.org/github/ja-vazquez/Upsilon/blob/master/Results/Upsilon_plots.ipynb)
 
 ###Comparison of the matter power spectrum computed by using only camb (red) and the *FrankenEmu*  emulator (blue)
 
