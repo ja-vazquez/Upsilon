@@ -9,17 +9,17 @@ class Useful_data:
 
         if 'sim' in data_type:
             bin_type = 'lin_rebin1'          # lin or log / bin or rebin
-            redz = ['0.25']                  # ,'0.40']
+            redz = ['0.25']                  # ['0.25','0.40']
             dir  = 'sim_results/'
 
         elif 'mocks' in data_type:
             bin_type = 'rebin1'              # lin1 or rebin1
-            redz = ['singlesnap']            # , 'allsnap', 'evol']
+            redz = ['singlesnap']            # ['singlesnap', 'allsnap', 'evol']
             dir  = 'mock_results/'
 
         elif 'lowz' in data_type:
             bin_type = 'log1_rebin'          # log1 or log1_rebin
-            redz = ['lowz']                  # , 'z1', 'z2']
+            redz = ['lowz']                  # ['lowz', 'z1', 'z2']
             dir = 'lowz_results/'
 
         return bin_type, redz, dir

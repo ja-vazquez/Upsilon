@@ -1,122 +1,85 @@
-
-def extra():
-   return ''
-
-
-def chain_dir(data_type):
-    dir = 'chains/'
-    if 'sim' in data_type:
-	dir += 'Sim_jk_b2/'
-    elif 'mocks' in data_type:
-        dir += 'Mocks/'
-    elif 'lowz' in data_type:
-        dir += 'Lowz/'
-    return dir
-
-
-
-def file_choice(data_type):
-	#Select the type of file to analyze
-    if 'sim' in data_type:
-       bin_type = ['lin_rebin']                #lin or log / bin or rebin
-       redzz = ['0.25'] #,'0.40']
-       dir  = 'sim_results/'
-
-    elif 'mocks' in data_type:
-       bin_type = ['rebin1'] #,'rebin1',lin1]                    #lin1 or rebin1
-       redzz = ['singlesnap', 'allsnap', 'evol']
-       dir  = 'mock_results/'
-
-    elif 'lowz' in data_type:
-       bin_type = ['log1_rebin']              #log1 or log1_rebin
-       redzz = ['lowz'] #, ['lowz''z1', 'z2']
-       dir = 'lowz_results/'
-
-    return bin_type, redzz, dir
-
-
-
-def z_mean(data_type, redz):
-    if 'lowz' in data_type:
-        if 'lowz' in redz:
-            return '0.27'
-        elif 'z1' in redz:
-            return '0.21'
-        elif 'z2' in redz:
-            return '0.31'
-    elif 'sim' in data_type:
-        return redz
-    else:
-        return '0.267'
-
-
-
-def files_name(data_type, bin_type, redz):
-	#select the file's name
-     if 'sim' in data_type:
-        file_name = data_type +'_'+ bin_type +'_z'+ redz +'_norsd_np0.001_nRT10_r0'
-     elif 'mocks' in data_type:
-	file_name = 'mock_bigMD_RST_' + redz + '_' + bin_type + '_DM1_r0' 
-#       file_name = data_type +'_RST'+ redz + bin_type + '_DM1_r0'
-     elif 'lowz' in data_type:
-        file_name = redz + '_' + bin_type + '_r0'
-     else:
-        print 'error'    
-    
-     return file_name
-
-
-
-def R0_files():
-    lnum =  2, 3, 4, 5, 6, 10
-    return lnum
-
-
-
-def  number_of_points(data_type, bin_type):
-   if 'sim' in data_type:
-      if 'lin_bin1' in bin_type:
-          lnp  =  134, 132, 130, 128, 126, 118, 98
-      elif 'lin_bin2' in bin_type:
-          lnp  = 76, 76, 74, 74, 72, 68, 58
-      elif 'lin_rebin' in bin_type:
-	  lnp = 102, 90, 82, 74, 70, 54
-      elif 'lin_rebin2' in bin_type:
-          lnp = 26, 24, 24, 22, 22, 18, 12
-      elif 'log_bin1' in bin_type:
-          lnp = 102, 90, 82, 74, 70, 54, 34
-      elif 'log_rebin1' in bin_type:
-          lnp = 22, 18, 18, 16, 16, 12, 8
-
-   elif 'mocks' in data_type:
-      if 'lin1' in bin_type:
-           lnp  =  134, 132, 130, 128, 126, 118
-      elif 'rebin1' in bin_type:
-           lnp = 28, 28, 28, 28, 28, 28
-      else:
-	   lnp = 28, 28, 28, 28, 28, 28
- 
-   elif 'lowz' in data_type:
-      if 'rebin' in bin_type: 
-           lnp =  28, 28, 28, 28, 28, 28
-      else:
-	   lnp = 184, 164, 148, 136, 126, 100
-
-   else:       print 'error'
-   return lnp
+import sys
 
 
 def print_message():
-       print """select sim/mocks/lowz  
-                lin1:log / bin:rebin1 / lowz:z1:z2  
+       print """select sim/mocks/lowz
+                lin1:log / bin:rebin1 / lowz:z1:z2
                 [0.25,0.40]/[steps_,]/[log1,log1_rebin]"""
 
 
+class Info_model:
+    def __init__(self, data_type, bin_type, redz):
+        self.data_type = data_type
+        self.bin_type  = bin_type
+        self.redz      = redz
+        self.nada = 'nothing'
+
+
+        #select file's name
+    def files_name(self):
+        fname = {'sim'  : self.data_type + '_' + self.bin_type + '_z' + self.redz + '_norsd_np0.001_nRT10_r0',
+                  'mocks': 'mock_bigMD_RST_' + self.redz + '_' + self.bin_type + '_DM1_r0',
+                  'lowz' : self.redz + '_' + self.bin_type + '_r0'}
+        return fname[self.data_type]
+
+        #select chains's folder
+    def chain_dir(self):
+        chdir = {'sim'  : 'Sim_jk_b2/',
+                 'mocks': 'Mocks/',
+                 'lowz' : 'Lowz/'}
+        return chdir[self.data_type]
+
+
+        # will read this number from a file later
+    def R0_files(self):
+        return 2, 3, 4, 5, 6, 10
+
+
+        # will read this number from a file later
+    def  number_of_points(self):
+        data_type = self.data_type
+        bin_type  = self.bin_type
+
+        if 'sim' in data_type:
+            if 'lin_bin1' in bin_type:
+                lnp = 102, 90, 82, 74, 70, 54, 34
+            elif 'log_rebin1' in bin_type:
+                lnp = 22, 18, 18, 16, 16, 12, 8
+
+        elif 'mocks' in data_type:
+            if 'lin1' in bin_type:
+                lnp  =  134, 132, 130, 128, 126, 118
+            elif 'rebin1' in bin_type:
+                lnp = 28, 28, 28, 28, 28, 28
+
+        elif 'lowz' in data_type:
+            if 'rebin' in bin_type:
+                lnp =  28, 28, 28, 28, 28, 28
+            else:
+                lnp = 184, 164, 148, 136, 126, 100
+
+        else:       print 'error'
+        return lnp
 
 
 
-def Text_ini_file():
-	txt = """
+    def z_mean(self):
+        #select redshift
+        if 'sim' in self.data_type:
+            return self.redz
+        elif 'lowz' in self.data_type:
+            z = {'lowz': '0.27', 'z1': '0.21', 'z2': '0.31'}
+            return z[self.redz]
+        else:
+            return '0.267'
+
+
+
+
+
+
+def Text_ini_file(threads = 3, action = 0):
+    txt = """
 #DEFAULT(batch1/CAMspec_defaults.ini)
 #DEFAULT(batch1/lowl.ini)
 #DEFAULT(batch1/lowLike.ini)
@@ -146,13 +109,13 @@ dragging_steps  = 5
 propose_scale = 2
 
 #If zero set automatically
-num_threads = 3
+num_threads = {th:d}
 
 indep_sample=0
 
 use_clik= F
 #MCMC = 0, JK =2
-action = 2
+action = {ac:d}
 
 #these are just small speedups for testing
 get_sigma8=T
@@ -174,8 +137,22 @@ use_XiAB = F
 #if use_coyote = F :upsilon_option (2) Xi, (1) Xicorr, (3) FFT_Pk linear
 #if use_coyote = T :upsilon_option (0) FFT_Coyo
 
-upsilon_option = 0\n\n"""
-	return txt 
+upsilon_option = 0\n\n""".format(th=threads, ac=action)
+    return txt
+
+
+
+def params_upsilon():
+    txt = """
+param[LRGa] = 1.8 1 2.5 0.02 0.02
+#param[LRGb] = 0 0 0 0 0
+param[LRGb] = 0.2 -2.5 2.5 0.01 0.01
+param[logA] = 3.076 2.6 3.2 0.02 0.02
+#param[logA] = 3.076 3.076 3.076 0 0
+\n\n"""
+    return txt
+
+
 
 
 def R0_params(R0, nR0):
@@ -187,40 +164,31 @@ mock_gg  = %i
     """%(R0, R0, nR0, nR0//2)
     return txt
 
-def params_upsilon():
-        txt = """
-param[LRGa] = 1.8 1 2.5 0.02 0.02
-#param[LRGb] = 0 0 0 0 0
-param[LRGb] = 0.2 -2.5 2.5 0.01 0.01
-param[logA] = 3.076 2.6 3.2 0.02 0.02
-#param[logA] = 3.076 3.076 3.076 0 0 
-\n\n"""
-	return txt
+
+
 
 
 
 def params_cosmo(data_type):
-   if 'sim' in data_type:
-	txt = """
+    if 'sim' in data_type:
+        txt = """
 #Omega_m = 0.292, Omega_b h^2 = 0.022, h=0.69.
 param[omegabh2] = 0.022 0.022 0.022 0 0
 param[omegach2] =0.1172 0.1172 0.1172 0 0
 param[theta] = 1.0422 1.0422 1.0422 0 0
 param[ns] = 0.965 0.965 0.965 0 0"""
-
-
-   else:
-	txt = """
+    else:
+        txt = """
 #h = 0.677, Omega_lamda= 0.692885, Omega_matter= 0.307115, 
 #Omega_baryons= 0.048206, n=0.96
 param[omegabh2] = 0.022140 0.022140 0.022140 0 0 
 param[omegach2] = 0.118911 0.118911 0.118911 0 0 
 param[theta] = 1.040042 1.040042 1.040042 0 0 
 param[ns] = 0.96 0.96 0.96 0 0"""
-	
-   return txt
+    return txt
 
 
 
-
- 
+if __name__ == '__main__':
+    info = Info_model('nada')
+    print info.name
