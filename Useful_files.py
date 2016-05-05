@@ -62,9 +62,8 @@ class Info_model:
         return lnp
 
 
-
-    def z_mean(self):
         #select redshift
+    def z_mean(self):
         if 'sim' in self.data_type:
             return self.redz
         elif 'lowz' in self.data_type:
@@ -154,7 +153,6 @@ param[logA] = 3.076 2.6 3.2 0.02 0.02
 
 
 
-
 def R0_params(R0, nR0):
     txt="""
 R0_gg    = %i.0
@@ -163,9 +161,6 @@ mock_NP  = %i
 mock_gg  = %i
     """%(R0, R0, nR0, nR0//2)
     return txt
-
-
-
 
 
 
