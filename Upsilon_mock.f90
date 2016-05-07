@@ -137,7 +137,7 @@ integer, parameter  :: numr= 304  !Stop there
           virgin=.False.
        end if
 
-        !Non-linear Theory
+        !Non-linear Pk with coyote emulator 
        if (use_coyote) then 
           print *,'Using Coyote emulator'
           x(1) =   CMB%ombh2               ! omega_b 
@@ -156,27 +156,28 @@ integer, parameter  :: numr= 304  !Stop there
           do ii=1, nn
              new_k(ii)  = y(ii)/h0
              new_pk(ii) = y(ii+ nn)*h0**3.0
-
-          enddo   
+          enddo  
+ 
           call CoyoSpl%init(new_k, new_pk)
           call IniFFT(ru, fftlog, CMB,Theory, 0)
           call FFTSpl%init(REAL(ru), REAL(fftlog))
        end if
 
-        ! Linear Theory
+        ! Linear Pk Theory
        do ki = 1,nn
-          k_lin(ki) = exp(alnkmin+(ki-1)*(alnkmax-alnkmin)/(nn-1.0))
+          k_lin(ki)  = exp(alnkmin+(ki-1)*(alnkmax-alnkmin)/(nn-1.0))
           pk_lin(ki) = MatterPowerat_Z(Theory,DBLE(k_lin(ki)), z_gg*1.0_dl)
        end do
 
        call PkkSpl%init(k_lin, pk_lin)
 
-       minr = 1. !2.0  
-       maxr = 150 !150.0
-
+       minr = 1.  
+       maxr = 150 
+        
+        ! Linear Xi theory
        do ii = 1, NR
-          xirr(ii) = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
-          xilin(ii) =  Xi(DBLE(xirr(ii)), CMB,Theory, z_gg*1.0_dl, 0.d0)
+          xirr(ii)   = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
+          xilin(ii)  = Xi(DBLE(xirr(ii)), CMB,Theory, z_gg*1.0_dl, 0.d0)
           xi2lin(ii) = (xilin(ii))**2.
        end do
 
@@ -206,7 +207,6 @@ integer, parameter  :: numr= 304  !Stop there
         !Check this number, for mocks should be one
        !rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
        rhobar =  CMB%hola*0.01
-       !print *, 'rhobar',rhobar !, CMB%hola 
 
        s8       = Theory%sigma_8
        upscalib = CMB%upscalib
@@ -236,15 +236,12 @@ integer, parameter  :: numr= 304  !Stop there
                  write (50,'(3G)'), kk, PkkSpl%eval(real(kk)), CoyoSpl%eval(real(kk)) 
               end do
             close(50)
-
             open (51,file='test_Xi.dat')
               do ii = 1, NR
                  rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
                  write (51,'(3G)'),  rad, XilinSpl%eval(real(rad)), FFTSpl%eval(real(rad))
               end do
             close(51)
-
-
             if (use_XiAB) then  
              open (52,file='test_Xi_Afid2.dat')
                do ii = 1, NR
@@ -294,9 +291,7 @@ integer, parameter  :: numr= 304  !Stop there
           else
              gfactgg=MatterPowerat_Z(Theory,0.01_dl,D%zdatagg*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
              gfactgm=MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,zdatafid*1.0_dl)
-          end if
-
-       
+          end if 
           if (use_XiAB) then 
              gfactgg0= 1.
              gfactgm0= 1.             
@@ -305,11 +300,9 @@ integer, parameter  :: numr= 304  !Stop there
              gfactgm0= MatterPowerat_Z(Theory,0.01_dl,D%zdatagm*1.0_dl)/MatterPowerat_Z(Theory,0.01_dl,0.0_dl)
           end if
  
-!print *,'gfactor', (s8/0.8)**4*gfactgg0**2, gfactgg0**2
 
-
-          minr = 1. !2.0     
-          maxr = 150. !150.0   
+          minr = 1.  
+          maxr = 150.
 
           do ii=1,NR
              rad      = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
@@ -370,18 +363,14 @@ integer, parameter  :: numr= 304  !Stop there
                   end do
                close(53)
             end if
-
             if (use_upsilon .eq. 99 .and. not (use_XiAB)) then
-             open (53,file='test_Tobias_XA.dat')
+             open (54,file='test_Tobias_XA.dat')
                 do ii = 1, NR
                   rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
-                  write (53,'(3G)'),  rad, GalPtA%eval(rad)*(s8/0.8)**4 *gfactgg0**2, GalPtB%eval(rad)*(s8/0.8)**4 * gfactgg0**2
-                  !write (53,'(3G)'),  rad, GalPtA%eval(rad), GalPtB%eval(rad) 
+                  write (54,'(3G)'),  rad, GalPtA%eval(rad)*(s8/0.8)**4 *gfactgg0**2, GalPtB%eval(rad)*(s8/0.8)**4 * gfactgg0**2
              end do
-             close(53)
+             close(54)
             end if
-
-
 
           diff(1:D%NP) = theo(1:D%NP) - D%dsups
           chx2 = DOT_PRODUCT(diff(1:D%NP),MATMUL(D%icov,diff(1:D%NP)))
@@ -413,8 +402,8 @@ integer, parameter  :: numr= 304  !Stop there
        real*8 function dsgmfunc(x)
           real*8 x
           real tr, xi, xi_A
-          tr= sqrt(rad**2+x**2)
-         xi = XiSpl%eval (tr) * gfactgm
+          tr = sqrt(rad**2+x**2)
+          xi = XiSpl%eval (tr) * gfactgm
 
           if (use_XiAB) then
             xi_A = Xi_ASpl%eval(tr)
@@ -585,7 +574,7 @@ integer, parameter  :: numr= 304  !Stop there
        real(dl) k, curz, k_in
        real*8, external :: rombint
 
-        Pk_AB = rombint (xifunc, -1d0, 1d0, 1d-2) !1d-2 use this
+        Pk_AB = rombint (xifunc, -1d0, 1d0, 1d-2) 
         contains
          real*8 function xifunc (u)
            real*8 u
@@ -604,7 +593,7 @@ integer, parameter  :: numr= 304  !Stop there
         real(dl) kdiff_min, kdiff_max
         real*8, external :: rombint
         
-        Int_q = rombint (xifunc, alnkmin2 , alnkmax2 , 1d-3)/(4*pi_**2) !1d-3 use this
+        Int_q = rombint (xifunc, alnkmin2 , alnkmax2 , 1d-3)/(4*pi_**2) 
                                               
         contains
         real*8 function xifunc (alnq)
@@ -621,8 +610,7 @@ integer, parameter  :: numr= 304  !Stop there
                         F2  = 5./7. + kmq*(0.5d0*k**2 - 5*q*kmq/7.)/(q*k_in) 
                      else
                         F2  = 1.0
-                     end if
-                     
+                     end if 
                      pow = PkkSpl%eval(real(sqrt(k_in)))*F2*PkkSpl%eval(real(q))
                  end if
 
@@ -631,9 +619,8 @@ integer, parameter  :: numr= 304  !Stop there
     end function Int_q   
 
     
-!!=--------------------------------------------
-!It's better to integrate in theta and then in q
-       !Integral in q
+        !!=--------------------------------------------
+        !It's better to integrate in theta and then in q
     real*8 function Xi_B (k, Theory, curz)
        implicit none
        Type(TheoryPredictions) Theory
@@ -641,13 +628,12 @@ integer, parameter  :: numr= 304  !Stop there
        real*8, external :: rombint
 
        Xi_B =  rombint (xifunc, alnkmin2 , alnkmax2 , 1d-4)/(4*pi_**2)
-                                                     !5d-4
+                                                     
        contains
        real*8 function xifunc (alnq)
           real*8 alnq, aq, pow
 
           aq     = exp(alnq) 
-          !pow    = MatterPowerat_Z(Theory,DBLE(aq),curz) * Xi_A (k, Theory, curz, aq )   
           pow = PkkSpl%eval(real(aq)) * Xi_del (k, Theory, curz, aq )
           xifunc = pow* aq**3   !=3, cause using log
        end function xifunc

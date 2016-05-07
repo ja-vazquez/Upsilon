@@ -350,6 +350,7 @@ class Chisq:
 
 
 if __name__=='__main__':
+
     mocks     = True
        
     MCMC      = False
@@ -396,7 +397,6 @@ if __name__=='__main__':
 
 
 
-
 """
 reshape_tables -> clean and reshape files provided by Sukhdeep
 
@@ -411,6 +411,4 @@ plot_bf    - > plot best-model along with data and errorbars
 plot_jk    - > plots points for each jks and displays stats  
 plot_chisq - > plots chisq for models and R0
 """
-
-
 
