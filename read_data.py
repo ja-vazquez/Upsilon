@@ -22,7 +22,7 @@ class Read_data:
         self.data_dir  = info.data_dir()
         self.njacks    = 100 if jackknife else 1
 
-        self.file_dir  = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/'
+        self.dir_in  = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/'
         self.dir_out   = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/reshaped/'
         self.name_gg   = '_upsgg_cov.dat'
         self.name_gm   = '_upsgm_cov.dat'
@@ -41,7 +41,7 @@ class Read_data:
 
 
     def reshape_tables(self, R0):
-        file_in  = self.file_dir + self.fname + str(R0)
+        file_in  = self.dir_in + self.fname + str(R0)
         file_out = self.dir_out + self.fname + str(R0)
         
         fdata = pd.read_csv(file_in + self.name_ups,
@@ -54,6 +54,7 @@ class Read_data:
         
         pd_tmp[['rp', 'all']].to_csv(file_out + self.name_ups,
                             header=None, index= None, sep='\t', float_format='%15.7e')
+        
         
 
         table1 = np.loadtxt(file_in + self.name_gg)
@@ -79,7 +80,7 @@ class Read_data:
                     f.write(str("%1.3e" %float(new_table2[n,m])) + ' ')
                 f.write('\n')
 
-        print '*** rows =',row*2, 'cols = ', col*2, ', R0 =', R0 
+        print '*** rows =',row*2, 'cols = ', col*2, 'R0 =', R0 
         
     
 
