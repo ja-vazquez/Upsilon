@@ -12,7 +12,7 @@ class Info_model:
         self.data_type = data_type
         self.bin_type  = bin_type
         self.redz      = redz
-	self.jackknife = jackknife
+        self.jackknife = jackknife
         self.nada = 'nothing'
 
 
@@ -30,9 +30,9 @@ class Info_model:
         chdir = {'sim'  : 'Sim',
                  'mocks': 'Mocks',
                  'lowz' : 'Lowz'}
-	ch = chdir[self.data_type]
+        ch = chdir[self.data_type]
 
-	if self.jackknife: ch += '_jk'
+        if self.jackknife: ch += '_jk'
         return ch + '/'
 
 

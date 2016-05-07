@@ -20,13 +20,13 @@ class Ini_file(Info_model):
 
 
         self.data_dir   = Info.data_dir()        
-	self.dir_in     = 'data_upsilon/' + self.data_dir
+        self.dir_in     = 'data_upsilon/' + self.data_dir
         self.dir_data   = 'lrgdata-final/mocks_lrg/sim_reshaped/'
         self.dir_stats  = 'stats/'
         self.dir_bf     = 'bestfit/'
-	self.dir_chains = 'chains/' + Info.chain_dir()
+        self.dir_chains = 'chains/' + Info.chain_dir()
         
-	self.name_root  = '_ups'
+        self.name_root  = '_ups'
         self.name_ups   = '_ups.dat'
         self.name_cov   = '_cov.dat'
         self.name_dist  = 'distparams'
@@ -52,7 +52,7 @@ class Ini_file(Info_model):
         #reshape the files provided by Sukhdeep, in order to feed them to CosmoMC
     def reshape_tables(self, R0, jk=0):
         file_in  = self.dir_in   + self.fname + str(R0)
-	file_ups = self.dir_in   + self.fname + str(R0)
+        file_ups = self.dir_in   + self.fname + str(R0)
         file_out = self.dir_data + self.fname + str(R0)
         if self.jackknife:
             file_ups   += '_jk{0:d}'.format(jk) 
@@ -66,7 +66,7 @@ class Ini_file(Info_model):
       
         lups = len(fdata)
         fdata_no_ggpoint = fdata[['rp', 'upsgg']][self.first_line:]
-	fdata_no_gmpoint = fdata[['rp', 'upsgm']][self.first_line:]
+        fdata_no_gmpoint = fdata[['rp', 'upsgm']][self.first_line:]
         pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
         pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['upsgm']
 	
@@ -98,7 +98,7 @@ class Ini_file(Info_model):
                 f.write('\n')
 
         print '*** ups =', len(pd_tmp[['rp', 'all']]), 'cov = ', row*2, 'R0 =', R0 
-	time.sleep(1.)        
+        time.sleep(1.)        
         
         
         
@@ -278,11 +278,11 @@ class Ini_file(Info_model):
 
 class Chisq:
     def __init__(self, data_type, bin_type, redzz):
-	Info = Info_model(data_type, bin_type, redz)
+        Info = Info_model(data_type, bin_type, redz)
         self.data_type= data_type
         self.bin_type = bin_type
         self.redzz     = redzz
-	self.fname      = Info.files_name()
+        self.fname      = Info.files_name()
 
     def plot_chisq(self):
         chisq_all, R0_all =[], []
@@ -326,23 +326,23 @@ if __name__=='__main__':
     for redz in redzz:
         Ini = Ini_file(data_type, bin_type, redz, jackknife= jackknife)
         for R0_points in Ini.R0_points:
-	  R0, nR0 = R0_points 
-          for jk in np.arange(100 if jackknife else 1):
-            if R0== 2: 
+            R0, nR0 = R0_points 
+            for jk in np.arange(100 if jackknife else 1):
+              if R0== 2: 
                 print R0_points, 'jk=', jk
                 #Ini.reshape_tables(R0, jk=jk)
                 #Ini.write_ini(R0, nR0, jk=jk, threads=3)
                 #Ini.write_wq(R0, jk=jk, run_wq=True, nodes=12, threads=3)
                 #Ini.write_dist(R0, run_dist=True)
-        	#Ini.write_bf(R0, run_bf=True)
-        	#Ini.plot_bf(R0)
-			#for jks
-		Ini.write_ini(R0, nR0, jk=jk, threads=1, action=2)
-		Ini.write_wq(R0, jk=jk, run_wq=True, nodes=1, threads=1)
-			# get chisqs
-		#Ini.write_ini(R0, nR0, threads=1, action=2)
-		#Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
-		#Ini.write_chisq(R0)
+                #Ini.write_bf(R0, run_bf=True)
+                #Ini.plot_bf(R0)
+                    #for jks
+                Ini.write_ini(R0, nR0, jk=jk, threads=1, action=2)
+                Ini.write_wq(R0, jk=jk, run_wq=True, nodes=1, threads=1)
+                    # get chisqs
+                #Ini.write_ini(R0, nR0, threads=1, action=2)
+                #Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
+                #Ini.write_chisq(R0)
 
     #chi = Chisq(data_type, bin_type, redzz)
     #chi.plot_chisq()
