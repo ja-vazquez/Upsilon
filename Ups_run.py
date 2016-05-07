@@ -311,7 +311,7 @@ class Chisq:
 
 if __name__=='__main__':
     mocks = True
-    jackknife = True
+    jackknife = False
 
     if mocks:
        data_type = 'mocks'
@@ -331,14 +331,14 @@ if __name__=='__main__':
               if R0== 2: 
                 print R0_points, 'jk=', jk
                 #Ini.reshape_tables(R0, jk=jk)
-                #Ini.write_ini(R0, nR0, jk=jk, threads=3)
+                Ini.write_ini(R0, nR0, jk=jk, threads=3)
                 #Ini.write_wq(R0, jk=jk, run_wq=True, nodes=12, threads=3)
                 #Ini.write_dist(R0, run_dist=True)
                 #Ini.write_bf(R0, run_bf=True)
                 #Ini.plot_bf(R0)
                     #for jks
-                Ini.write_ini(R0, nR0, jk=jk, threads=1, action=2)
-                Ini.write_wq(R0, jk=jk, run_wq=True, nodes=1, threads=1)
+                #Ini.write_ini(R0, nR0, jk=jk, threads=1, action=2)
+                #Ini.write_wq(R0, jk=jk, run_wq=True, nodes=1, threads=1)
                     # get chisqs
                 #Ini.write_ini(R0, nR0, threads=1, action=2)
                 #Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
