@@ -8,10 +8,11 @@ def print_message():
     # Most of these parameters are given by Sukhdeep
     # so be careful as they may change
 class Info_model:
-    def __init__(self, data_type, bin_type, redz):
+    def __init__(self, data_type, bin_type, redz, jackknife=False):
         self.data_type = data_type
         self.bin_type  = bin_type
         self.redz      = redz
+	self.jackknife = jackknife
         self.nada = 'nothing'
 
 
@@ -26,10 +27,13 @@ class Info_model:
 
         #select chains's folder
     def chain_dir(self):
-        chdir = {'sim'  : 'Sim_jk_b2/',
-                 'mocks': 'Mocks/',
-                 'lowz' : 'Lowz/'}
-        return chdir[self.data_type]
+        chdir = {'sim'  : 'Sim',
+                 'mocks': 'Mocks',
+                 'lowz' : 'Lowz'}
+	ch = chdir[self.data_type]
+
+	if self.jackknife: ch += '_jk'
+        return ch + '/'
 
 
         #select data's folder

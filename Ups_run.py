@@ -1,6 +1,6 @@
 
 import os, sys, time
-from Useful_files import Info_model
+from Ups_data import Info_model
 import Latex_files as lf
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -10,7 +10,7 @@ import numpy as np
 
 class Ini_file(Info_model):
     def __init__(self, data_type, bin_type, redz, jackknife = False):
-        Info = Info_model(data_type, bin_type, redz)
+        Info = Info_model(data_type, bin_type, redz, jackknife=jackknife)
 
         self.data_type  = data_type
         self.bin_type   = bin_type
@@ -20,14 +20,13 @@ class Ini_file(Info_model):
 
 
         self.data_dir   = Info.data_dir()        
-        self.dir_chains = 'chains/' + Info.chain_dir()
+	self.dir_in     = 'data_upsilon/' + self.data_dir
         self.dir_data   = 'lrgdata-final/mocks_lrg/sim_reshaped/'
-        self.dir_in     = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/'
-        self.dir_out    = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/reshaped/'
         self.dir_stats  = 'stats/'
         self.dir_bf     = 'bestfit/'
-
-        self.name_root  = '_ups'
+	self.dir_chains = 'chains/' + Info.chain_dir()
+        
+	self.name_root  = '_ups'
         self.name_ups   = '_ups.dat'
         self.name_cov   = '_cov.dat'
         self.name_dist  = 'distparams'
@@ -45,32 +44,35 @@ class Ini_file(Info_model):
         if len(self.R0)!= len(self.npoints):  sys.exit("Error: check number of files")
         self.R0_points  = zip(self.R0, self.npoints)
         
-        Info_model.__init__(self, data_type, bin_type, redz)
-        print self.nada
+        #Info_model.__init__(self, data_type, bin_type, redz)
+        #print self.nada
 
 
 
         #reshape the files provided by Sukhdeep, in order to feed them to CosmoMC
     def reshape_tables(self, R0, jk=0):
-        file_in  = self.dir_in  + self.fname + str(R0)
-        file_out = self.dir_out + self.fname + str(R0)
-        if self.jackknife and jk != 0:
-            file_in   += '_jk{0:d}'.format(jk) 
+        file_in  = self.dir_in   + self.fname + str(R0)
+	file_ups = self.dir_in   + self.fname + str(R0)
+        file_out = self.dir_data + self.fname + str(R0)
+        if self.jackknife:
+            file_ups   += '_jk{0:d}'.format(jk) 
             file_out  += '_jk{0:d}'.format(jk) 
          
          
             
-        fdata = pd.read_csv(file_in + self.name_ups,
+        fdata = pd.read_csv(file_ups + self.name_ups,
                             sep='\s+', skiprows=[0], 
                             names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err'])
       
         lups = len(fdata)
-        pd_tmp = pd.concat([fdata[['rp', 'upsgg']], fdata[['rp', 'upsgm']]]).fillna(0) 
+        fdata_no_ggpoint = fdata[['rp', 'upsgg']][self.first_line:]
+	fdata_no_gmpoint = fdata[['rp', 'upsgm']][self.first_line:]
+        pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
         pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['upsgm']
-            
+	
+           
         pd_tmp[['rp', 'all']].to_csv(file_out + self.name_ups,
                             header=None, index= None, sep='\t', float_format='%15.7e')
-        
         
             #covariace matrix for gg and gm
         table1 = np.loadtxt(file_in + self.name_gg)
@@ -95,21 +97,21 @@ class Ini_file(Info_model):
                     f.write(str("%1.3e" %float(new_table2[n,m])) + ' ')
                 f.write('\n')
 
-        print '*** rows =',row*2, 'cols = ', col*2, 'R0 =', R0 
-        
+        print '*** ups =', len(pd_tmp[['rp', 'all']]), 'cov = ', row*2, 'R0 =', R0 
+	time.sleep(1.)        
         
         
         
         #Write .INI files 
-    def write_ini(self, R0, nR0, jk=0):
+    def write_ini(self, R0, nR0, jk=0, threads=3, action=0):
         full_name = self.fname + str(R0)        
-        if self.jackknife and jk != 0: 
+        if self.jackknife: 
             full_name += '_jk{0:d}'.format(jk)
             
-        print full_name
+        print 'Ini', full_name
 
         with open('INI_{}.ini'.format(full_name), 'w') as f:
-            f.write(lf.text_ini_file())
+            f.write(lf.text_ini_file(threads = threads, action = action))
             f.write(lf.params_upsilon())
             f.write('use_upsilon= 98\n')
             f.write('samples  = 10000000\n')
@@ -127,7 +129,8 @@ class Ini_file(Info_model):
             f.write('file_root = ' + self.dir_chains + full_name + self.name_root + '\n')
             f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
             f.write('mock_cov  = ' + self.dir_data   + full_name + self.name_cov  + '\n')
-
+	
+            time.sleep(2.)
 
 
         #Once we have the MCchains, get best-fit values
@@ -139,7 +142,7 @@ class Ini_file(Info_model):
                    'upper1','lower2','upper2','name','other']
 
         lines   =  pd.read_csv(file_bf, names= names, sep='\s+', skiprows=[0,1], index_col='name')
-        print lines
+        print 'bf', lines
 
         b1_bf   =  float(lines.ix['bias_1']['bestfit'])
         b2_bf   =  float(lines.ix['bias_2']['bestfit'])
@@ -152,7 +155,7 @@ class Ini_file(Info_model):
             f.write('use_upsilon = 99\n')
             f.write('samples     = 8\n')
 
-            f.write(lf.text_ini_file(threads = 1, action = 2))
+            f.write(lf.text_ini_file())
             f.write('best_fit = {0:s}best_{1:s}.dat\n'.format(self.dir_bf, full_name))
             f.write('aver     = {0:1.2f}\n'.format(self.aver if 'rebin' in bin_type else 0))
             f.write(lf.params_cosmo(self.data_type) + '\n\n')
@@ -208,10 +211,10 @@ class Ini_file(Info_model):
 
 
         #Analyze the chains
-    def write_dist(self, R0, jk=None, run_dist=False):
+    def write_dist(self, R0, run_dist=False):
         txt='file_root=chains/Sim_rmin_gt_R0/Rmin_70_sim_z0.25_norsd_np0.001_nRT10_r02_ups'
         full_name = '{0:s}{1:d}'.format(self.fname, R0)
-        print full_name
+        print 'distpars', full_name
 
         txt_new = 'file_root=' + self.dir_chains + full_name + self.name_root
         f1 = open(self.name_dist + '.ini', 'r')
@@ -233,32 +236,32 @@ class Ini_file(Info_model):
         #Write a bunch of files that will run everything in the BNL cluster
     def write_wq(self, R0, jk=0, run_wq=False, nodes=12, threads=3):
         full_name = self.fname + str(R0)        
-        if self.jackknife and jk != 0: 
+        if self.jackknife: 
             full_name += '_jk{0:d}'.format(jk)
-        print full_name
+        print 'wq', full_name
 
-        with open('wq_{}.ini'.format(full_name), 'w') as f:
+        with open('wq_{0:s}.ini'.format(full_name), 'w') as f:
             f.write('mode: bycore\n')
-            f.write('N: {}\n'.format(nodes))
-            f.write('threads: {}\n'.format(threads))
+            f.write('N: {0:d}\n'.format(nodes))
+            f.write('threads: {0:d}\n'.format(threads))
             f.write('hostfile: auto\n')
-            f.write('job_name: {}\n'.format(full_name))
+            f.write('job_name: {0:s}\n'.format(full_name))
             f.write('command: |\n')
-            f.write('    source ~/.bashrc; \n')
-            f.write('    OMP_NUM_THREADS=%%threads%% mpirun -hostfile %%hostfile%% '
+            f.write('     source ~/.bashrc; \n')
+            f.write('     OMP_NUM_THREADS=%threads% mpirun -hostfile %hostfile% '
                     './cosmomc INI_{name:s}.ini > {dir:s}logs/INI_{name:s}.log 2>{dir:s}logs/INI_{name:s}.err'.format(name=full_name, dir=self.dir_chains))
 
         if run_wq:
-            commd="""nohup wq sub wq_{}.ini &"""%(full_name)
+            commd="""nohup wq sub wq_{0:s}.ini &""".format(full_name)
             os.system(commd)
-            time.sleep(1.)
+            time.sleep(2.)
 
 
 
         #Collect chisq from all the models
     def write_chisq(self, R0):
         full_name = '{0:s}{1:d}'.format(self.fname, R0)
-        file_chisq = self.dir_stats + full_name + self.name_root + '.minimum'
+        file_chisq = self.dir_chains + full_name + self.name_root + '.minimum'
 
         with open(file_chisq, 'rb') as f:
             for line in f:
@@ -275,15 +278,16 @@ class Ini_file(Info_model):
 
 class Chisq:
     def __init__(self, data_type, bin_type, redzz):
+	Info = Info_model(data_type, bin_type, redz)
         self.data_type= data_type
         self.bin_type = bin_type
         self.redzz     = redzz
+	self.fname      = Info.files_name()
 
     def plot_chisq(self):
         chisq_all, R0_all =[], []
         for redz in self.redzz:
-            Ini       = Ini_file(self.data_type, self.bin_type, self.redzz)
-            file_name = 'chisq_' + Ini.fname + '.dat'
+            file_name = 'chisq_' + self.fname + '.dat'
             lines     =  pd.read_csv(file_name, names= ['R0', 'chisq'], sep='\s+')
 
             chisq_all.append(lines['chisq'])
@@ -307,6 +311,8 @@ class Chisq:
 
 if __name__=='__main__':
     mocks = True
+    jackknife = True
+
     if mocks:
        data_type = 'mocks'
        bin_type  = 'rebin1'
@@ -316,19 +322,27 @@ if __name__=='__main__':
        bin_type  = 'log1_rebin'
        redzz     = ['lowz']
 
+    
     for redz in redzz:
-        Ini = Ini_file(data_type, bin_type, redz)
+        Ini = Ini_file(data_type, bin_type, redz, jackknife= jackknife)
         for R0_points in Ini.R0_points:
-            R0, nR0 = R0_points
-            if True: 
-                #print R0_points
-                #Ini.reshape_tables(R0)
-                #Ini.write_chisq(R0)
-                Ini.write_ini(R0, nR0)
-                #Ini.write_wq(R0, run_wq=False, nodes=1, threads=1)
+	  R0, nR0 = R0_points 
+          for jk in np.arange(100 if jackknife else 1):
+            if R0== 2: 
+                print R0_points, 'jk=', jk
+                #Ini.reshape_tables(R0, jk=jk)
+                #Ini.write_ini(R0, nR0, jk=jk, threads=3)
+                #Ini.write_wq(R0, jk=jk, run_wq=True, nodes=12, threads=3)
                 #Ini.write_dist(R0, run_dist=True)
-        	    #Ini.write_bf(R0, run_bf=True)
-        	    #Ini.plot_bf(R0)
+        	#Ini.write_bf(R0, run_bf=True)
+        	#Ini.plot_bf(R0)
+			#for jks
+		Ini.write_ini(R0, nR0, jk=jk, threads=1, action=2)
+		Ini.write_wq(R0, jk=jk, run_wq=True, nodes=1, threads=1)
+			# get chisqs
+		#Ini.write_ini(R0, nR0, threads=1, action=2)
+		#Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
+		#Ini.write_chisq(R0)
 
     #chi = Chisq(data_type, bin_type, redzz)
     #chi.plot_chisq()
