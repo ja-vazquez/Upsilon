@@ -18,9 +18,11 @@ class Info_model:
         #select file's name
     def files_name(self):
         fname = {'sim'  : self.data_type + '_' + self.bin_type + '_z' + self.redz + '_norsd_np0.001_nRT10_r0',
-                  'mocks': 'mock_bigMD_RST_' + self.redz + '_' + self.bin_type + '_DM1_r0',
-                  'lowz' : self.redz + '_' + self.bin_type + '_r0'}
+                 'mocks': 'mock_bigMD_RST_' + self.redz + '_' + self.bin_type + '_DM1_r0',
+                 'lowz' : self.redz + '_' + self.bin_type + '_r0'}
         return fname[self.data_type]
+
+
 
         #select chains's folder
     def chain_dir(self):
@@ -30,9 +32,20 @@ class Info_model:
         return chdir[self.data_type]
 
 
+        #select data's folder
+    def data_dir(self):
+        ddir = {'sim'  : 'sim_results/',
+                'mocks': 'mock_results/',
+                'lowz' : 'lowz_results/'
+                }
+        return ddir[self.data_type]
+
+
+
         # will read this number from a file later
     def R0_files(self):
         return 2, 3, 4, 5, 6, 10
+
 
 
         # will read this number from a file later

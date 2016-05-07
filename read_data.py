@@ -2,93 +2,100 @@
 
 import numpy as np
 from Useful_data import *
+from Useful_files import *
+import pandas as pd
+
 
 
 data_type = 'mocks'			    #sim, mocks,lowz
-jackknife  = False              #True
+jackknife  = False                   #True
 
 
-        #select type of file to anlayze
-Ud = Useful_data()
-bin_type, redzz, dir = Ud.file_choice(data_type)
-njacks = 100 if jackknife else 1
+class Read_data:
+    def __init__(self, data_type, bin_type, redz):
+        info = Info_model(data_type, bin_type, redz)
+        self.data_type =  data_type
+        self.bin_type  = bin_type
+        self.redz      = redz
+        self.fname     = info.files_name()
 
-#------------------------------------------
+        self.data_dir  = info.data_dir()
+        self.njacks    = 100 if jackknife else 1
 
-file_dir  = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/' #'sim_files/lowz_clustering_lensing/'+dir
-dir_out   = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/reshaped/'   #'sim_reshaped/'
-name_gg   = '_upsgg_cov.dat'
-name_gm   = '_upsgm_cov.dat'
-
-
-lnum  =  Ud.R0_files()
-first_point, last_point = 1 , 70	#select the range of points
-fline = 1				#skip first line
-
-#---------------------------------------------
-
-for i in range(njacks):
-
- name_ups  = '_ups.dat'
- name_cov  = '_cov.dat'
- if jackknife:
-    name_ups = '_jk%i'%(i) + name_ups
-    name_cov = '_jk%i'%(i) + name_cov
-
- for redz in redzz:			 #select the file's name
-   file_name = Ud.files_name(data_type, bin_type, redz)
-
-   for num in lnum:
-       fdata    = open(file_dir + file_name + str(num) + name_ups)
-       file_read = fdata.readlines()
-
-       rp, ups_gg, ups_gm = [], [], []
-
-       for l, _ in enumerate(file_read):
-            vals = file_read[l].split()
-            if vals[0] != '#':
-                if (float(vals[0]) < last_point and float(vals[0]) > first_point):
-                    rp.append(vals[0])
-                    ups_gg.append(vals[1])
-                    ups_gm.append(vals[3])
-       lups =  len(ups_gg)
-       fdata.close()
-
-       i = 0
-        #new Format file
-       with open(dir_out  + file_name + str(num) + name_ups, 'w') as f:
-          for l in range(fline, lups ):
-            f.write(str(rp[l] + '\t' + ups_gg[l] + '\n'))
-          for l in range(fline, lups ):
-            f.write(str(rp[l] + '\t' + ups_gm[l] + '\n'))
-            i += 1
-       print redz, 'R0', num, 'len_file',i*2
+        self.file_dir  = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/'
+        self.dir_out   = '/Users/josevazquezgonzalez/Desktop/Ups/Git/Upsilon/data/reshaped/'
+        self.name_gg   = '_upsgg_cov.dat'
+        self.name_gm   = '_upsgm_cov.dat'
+        self.name_ups  = '_ups.dat'
+        self.name_cov  = '_cov.dat'
 
 
-        # New cov matrix
-       table1 = np.loadtxt(file_dir + file_name + str(num) + name_gg)
-       table2 = np.loadtxt(file_dir + file_name + str(num) + name_gm)
+        self.R0          = info.R0_files()
+        self.first_point = 1         #select the range of points
+        self.last_point  = 70
+        self.first_line  = 1				#skip first line
 
-       new_table1 = table1[fline: lups, fline: lups]
-       new_table2 = table2[fline: lups, fline: lups]
-
-       row, col = new_table1.shape
-       zero= '0 '*row
+ #if jackknife:
+ #   name_ups = '_jk%i'%(i) + name_ups
+ #   name_cov = '_jk%i'%(i) + name_cov
 
 
-       with open(dir_out +  file_name + str(num) + name_cov , 'w') as f:
-          for n in range(row):
-             for m in range(col):
-                f.write(str("%1.3e" %float(new_table1[n,m])) + ' ')
-             f.write(zero)
-             f.write('\n')
+    def reshape_tables(self, R0):
+        file_in  = self.file_dir + self.fname + str(R0)
+        file_out = self.dir_out + self.fname + str(R0)
+        
+        fdata = pd.read_csv(file_in + self.name_ups,
+                            sep='\s+', skiprows=[0], 
+                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err'])
+      
+        lups = len(fdata)
+        pd_tmp = pd.concat([fdata[['rp', 'upsgg']], fdata[['rp', 'upsgm']]]).fillna(0) 
+        pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['upsgm']
+        
+        pd_tmp[['rp', 'all']].to_csv(file_out + self.name_ups,
+                            header=None, index= None, sep='\t', float_format='%15.7e')
+        
+
+        table1 = np.loadtxt(file_in + self.name_gg)
+        table2 = np.loadtxt(file_in + self.name_gm)
+        
+        new_table1 = table1[self.first_line: lups, self.first_line: lups]
+        new_table2 = table2[self.first_line: lups, self.first_line: lups]    
     
-          for n in range(row):
-             f.write(zero)
-             for m in range(col):
-                f.write(str("%1.3e" %float(new_table2[n,m])) + ' ')
-             f.write('\n')
+        row, col = new_table1.shape
+        zero= '0 '*row
+        
+        
+        with open(file_out + self.name_cov, 'w') as f:
+            for n in range(row):
+                for m in range(col):
+                    f.write(str("%1.3e" %float(new_table1[n,m])) + ' ')
+                f.write(zero)
+                f.write('\n')
+    
+            for n in range(row):
+                f.write(zero)
+                for m in range(col):
+                    f.write(str("%1.3e" %float(new_table2[n,m])) + ' ')
+                f.write('\n')
 
-       print '*** rows =',row*2, 'cols = ', col*2 
+        print '*** rows =',row*2, 'cols = ', col*2, ', R0 =', R0 
+        
+    
+
+if __name__ == '__main__':
+
+    if True:
+       data_type = 'mocks'
+       bin_type  = 'rebin1'
+       redzz     = ['singlesnap'] #,'allsnap', 'evol']
+
+
+    for redz in redzz:
+        Ini = Info_model(data_type, bin_type, redz)
+        Rdata= Read_data(data_type, bin_type, redz)
+        for R0_points in Ini.R0_files():
+            if True:
+                Rdata.reshape_tables(R0_points)
 
 

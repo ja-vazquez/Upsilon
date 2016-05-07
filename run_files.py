@@ -1,6 +1,6 @@
-# only select between lin or log
+
 import os, sys, time
-from Useful_files import *
+from Useful_files import Info_model
 import matplotlib.pyplot as plt
 import pandas as pd
 
