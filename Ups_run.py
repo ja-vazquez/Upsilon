@@ -1,7 +1,7 @@
 
 import os, sys, time
 from Ups_data import Info_model
-import Latex_files as lf
+import Ups_latex as lf
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -9,13 +9,13 @@ import numpy as np
 
 
 class Ini_file(Info_model):
-    def __init__(self, data_type, bin_type, redz, jackknife = False):
-        Info = Info_model(data_type, bin_type, redz, jackknife=jackknife)
+    def __init__(self, data_type, bin_type, redz, jack = False):
+        Info = Info_model(data_type, bin_type, redz, jackknife=jack)
 
         self.data_type  = data_type
         self.bin_type   = bin_type
         self.redz       = redz
-        self.jackknife  = jackknife
+        self.jackknife  = jack
         self.fname      = Info.files_name()
 
 
@@ -32,6 +32,7 @@ class Ini_file(Info_model):
         self.name_dist  = 'distparams'
         self.name_gg    = '_upsgg_cov.dat'
         self.name_gm    = '_upsgm_cov.dat'        
+        self.name_jk    = '_jk_stats.dat'
 
         self.aver       = 0.0
         self.first_point= 1
@@ -44,6 +45,8 @@ class Ini_file(Info_model):
         if len(self.R0)!= len(self.npoints):  sys.exit("Error: check number of files")
         self.R0_points  = zip(self.R0, self.npoints)
         
+        
+        self.write_pars = ['sigma8', 'LRGa', 'LRGb']
         #Info_model.__init__(self, data_type, bin_type, redz)
         #print self.nada
 
@@ -84,6 +87,7 @@ class Ini_file(Info_model):
         row, col = new_table1.shape
         zero= '0 '*row
         
+            # we leave it in this way for now
         with open(file_out + self.name_cov, 'w') as f:
             for n in range(row):
                 for m in range(col):
@@ -174,6 +178,7 @@ class Ini_file(Info_model):
             commd = './cosmomc bf_INI_{}.ini'.format(full_name)
             os.system(commd)
             time.sleep(3.)
+
 
 
         #Plot best-fit model along with data and errorbars
@@ -274,6 +279,41 @@ class Ini_file(Info_model):
 
 
 
+        #Collect info from the 100 jacknives
+    def write_jk(self, R0, jk):
+        full_name = self.fname + str(R0) + '_jk{0:d}'.format(jk)  + '_ups.minimum' 
+        read_jk = pd.read_csv(self.dir_chains + full_name,
+                                names = ['npar', 'value', 'name', 'latex', 'other'],
+                                skiprows=[0,1,2], sep='\s+', index_col=['name'])
+         
+                               
+        write_jk       = read_jk.ix[self.write_pars, ['value']].T  
+        write_jk['jk'] = jk        
+        write_jk.to_csv(self.fname + self.name_jk, mode='a', index=None, sep='\t', header=None)
+
+
+
+
+    def plot_jk(self, R0):
+        jks = ['jk']
+        self.write_pars.extend(jks)
+        jk_stat = pd.read_csv(self.fname + self.name_jk, names = self.write_pars,  sep='\s+')
+        
+            # just test
+        fig = plt.figure(figsize=(15,6))
+        ax1 = fig.add_subplot(1,3,1)
+        ax2 = fig.add_subplot(1,3,2)
+        ax3 = fig.add_subplot(1,3,3)
+        ax = [ax1, ax2, ax3]
+        for i,x in zip(self.write_pars, ax):
+            if i is not 'jk':
+                print i, jk_stat[i].mean(), '+/-', jk_stat[i].std()*10.
+                jk_stat.plot.scatter(x='jk', y=i, ax=x)
+        plt.show()
+        
+
+
+
 
 
 class Chisq:
@@ -310,8 +350,11 @@ class Chisq:
 
 
 if __name__=='__main__':
-    mocks = True
-    jackknife = True
+    mocks     = True
+       
+    MCMC      = False
+    jack      = True
+    chisq     = False
 
     if mocks:
        data_type = 'mocks'
@@ -324,25 +367,50 @@ if __name__=='__main__':
 
     
     for redz in redzz:
-        Ini = Ini_file(data_type, bin_type, redz, jackknife= jackknife)
+        Ini = Ini_file(data_type, bin_type, redz, jack= jack)
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
-            for jk in np.arange(100 if jackknife else 1):
-              if R0== 2: 
-                print R0_points, 'jk=', jk
-                #Ini.reshape_tables(R0, jk=jk)
-                #Ini.write_ini(R0, nR0, jk=jk, threads=3)
-                #Ini.write_wq(R0, jk=jk, run_wq=True, nodes=12, threads=3)
-                #Ini.write_dist(R0, run_dist=True)
-                #Ini.write_bf(R0, run_bf=True)
-                #Ini.plot_bf(R0)
-                    #for jks
-                Ini.write_ini(R0, nR0, jk=jk, threads=1, action=2)
-                Ini.write_wq(R0, jk=jk, run_wq=True, nodes=1, threads=1)
-                    # get chisqs
-                #Ini.write_ini(R0, nR0, threads=1, action=2)
-                #Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
-                #Ini.write_chisq(R0)
+            for jk in np.arange(100 if jack else 1):
+                if R0== 2: 
+                   print R0_points, 'jk=', jk
+                   if jack:
+                      Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
+                      Ini.write_wq(R0, jk=jk, run_wq=True, nodes=1, threads=1)
+                      Ini.write_jk(R0, jk)
+                      Ini.plot_jk(R0)
+                   if MCMC:
+                      Ini.reshape_tables(R0, jk=jk)
+                      Ini.write_ini(R0, nR0, jk=jk)
+                      Ini.write_wq(  R0, jk=jk, run_wq  =True)
+                      Ini.write_dist(R0,        run_dist=True)
+                      Ini.write_bf(  R0,        run_bf  =True)
+                      Ini.plot_bf(   R0)              
+                   if chisq:   
+                      Ini.write_ini(R0, nR0,      threads=1, action=2)
+                      Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
+                      Ini.write_chisq(R0)
+  
+    if chisq:
+        chi = Chisq(data_type, bin_type, redzz)
+        chi.plot_chisq()
 
-    #chi = Chisq(data_type, bin_type, redzz)
-    #chi.plot_chisq()
+
+
+
+"""
+reshape_tables -> clean and reshape files provided by Sukhdeep
+
+write_ini  - > writes .INI files as the input of SimpleMC
+write_wq   - > writes .wq files as the input to the BNL cluster
+write_jk   - > cleans the 100 jk files for plotting
+write_chisq- > collect chisqs from different R0 and models
+write_dist - > once we have the MCchains, write files to analyzed them
+write_bf   - > once analyzed the chians, get best-fit values
+
+plot_bf    - > plot best-model along with data and errorbars
+plot_jk    - > plots points for each jks and displays stats  
+plot_chisq - > plots chisq for models and R0
+"""
+
+
+
