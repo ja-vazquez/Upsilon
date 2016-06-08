@@ -107,9 +107,9 @@ integer, parameter  :: numr= 304  !Stop there
        real chi2, chi2c,zdata, factor
        real  rl, t1 ,t2, rad
 
-       type (CSpline) :: XiSpl, SigmaGG, SigmaGM, GetGG, GetGM
+       type (CSpline) :: XiSpl, SigmaGG, SigmaGM, SigmaMM, GetGG, GetGM, GetMM
        integer, parameter :: NR = 150 !// from 100 before
-       real, dimension (NR) :: xirr,xival, xival0,xival2, xilin, xi2lin, thgg, thgm
+       real, dimension (NR) :: xirr,xival, xival0,xival2,xivalmm, xilin, xi2lin, thgg, thgm, thmm
        real :: minr, maxr, corrfact, alphacross, gfactgg, gfactgm
        real :: gfactgg0, gfactgm0, s8, ryr, upscalib
        real*8, external :: rombint
@@ -327,20 +327,24 @@ integer, parameter  :: numr= 304  !Stop there
           do ii=1, NR
              rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
              xirr(ii)   = rad
+             xivalmm(ii)= 2*rombint(dsmmfunc, 0d0, DBLE(maxrgg), 1d-5)
              xival(ii)  = 2*rombint(dsggfunc, 0d0, DBLE(maxrgg), 1d-5)
              xival2(ii) = 2*rombint(dsgmfunc, 0d0, DBLE(maxrgm), 1d-5)
           end do
 
+          call SigmaMM%init(xirr, xivalmm)
           call SigmaGG%init(xirr, xival)
           call SigmaGM%init(xirr, xival2)
 
           do ii=1, NR
              rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
              xirr(ii) = rad
+             thmm(ii) = GetUpsilon(SigmaMM, rad ,D%ggR0)
              thgg(ii) = GetUpsilon(SigmaGG, rad ,D%ggR0)         
              thgm(ii) = GetUpsilon(SigmaGM, rad ,D%gmR0)
           end do
 
+          call GetMM%init(xirr, thmm)
           call GetGG%init(xirr, thgg)
           call GetGM%init(xirr, thgm)
 
@@ -359,7 +363,7 @@ integer, parameter  :: numr= 304  !Stop there
             if (use_upsilon .eq. 99) then
                open (53,file= best_fit)
                   do ii=1,int(D%NP)
-                     write (53,*)D%rra(ii),D%dsups(ii),sqrt(D%cov(ii,ii)), theo(ii)
+                     write (53,'(5G)'), D%rra(ii),D%dsups(ii),sqrt(D%cov(ii,ii)), theo(ii), GetMM%eval(D%rra(ii))
                   end do
                close(53)
             end if
@@ -375,6 +379,19 @@ integer, parameter  :: numr= 304  !Stop there
           diff(1:D%NP) = theo(1:D%NP) - D%dsups
           chx2 = DOT_PRODUCT(diff(1:D%NP),MATMUL(D%icov,diff(1:D%NP)))
        end function GetDataChi2
+
+
+
+       real*8 function dsmmfunc (x)
+          real*8 x
+          real tr, xi, xi_A, xi_B
+          real b2
+          tr= sqrt(rad**2+x**2)
+          xi = XiSpl%eval (tr) * gfactgg
+
+          dsmmfunc = xi 
+       end function dsmmfunc
+
 
 
        real*8 function dsggfunc (x)
