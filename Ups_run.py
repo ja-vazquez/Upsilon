@@ -39,7 +39,8 @@ class Ini_file(Info_model):
         self.last_point = 70
         self.first_line = 1
         self.z_mean     = Info.z_mean()            
-                                
+
+	self.full_cov   = 'logre1'                                
         self.R0         = Info.R0_files()
         self.npoints    = Info.number_of_points()
         if len(self.R0)!= len(self.npoints):  sys.exit("Error: check number of files")
@@ -65,7 +66,7 @@ class Ini_file(Info_model):
             
         fdata = pd.read_csv(file_ups + self.name_ups,
                             sep='\s+', skiprows=[0], 
-                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err'])
+                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err', 'rcc', 'rcc_err'])
       
         lups = len(fdata)
         fdata_no_ggpoint = fdata[['rp', 'upsgg']][self.first_line:]
@@ -121,14 +122,14 @@ class Ini_file(Info_model):
             f.write('samples  = 10000000\n')
 
             f.write('best_fit = {0:s}best_{1:s}.dat\n'.format(self.dir_bf, full_name))
-            f.write('aver     = {0:1.1f}\n'.format(self.aver if 'rebin' in self.bin_type else 0))
+            f.write('aver     = {0:1.1f}\n'.format(self.aver if self.full_cov in self.bin_type else 0))
             f.write(lf.params_cosmo(self.data_type) + '\n\n')
 
             f.write('z_gg     = {}   \n'.format(self.z_mean))
             f.write('z_gm     = {}   \n'.format(self.z_mean))
 
             f.write(lf.R0_params(R0, nR0) + '\n')
-            f.write('use_diag = {0:s}\n\n'.format('F' if 'rebin' in self.bin_type else 'T'))
+            f.write('use_diag = {0:s}\n\n'.format('F' if self.full_cov in self.bin_type else 'T'))
 
             f.write('file_root = ' + self.dir_chains + full_name + self.name_root + '\n')
             f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
@@ -161,14 +162,14 @@ class Ini_file(Info_model):
 
             f.write(lf.text_ini_file())
             f.write('best_fit = {0:s}best_{1:s}.dat\n'.format(self.dir_bf, full_name))
-            f.write('aver     = {0:1.2f}\n'.format(self.aver if 'rebin' in bin_type else 0))
+            f.write('aver     = {0:1.2f}\n'.format(self.aver if self.full_cov in bin_type else 0))
             f.write(lf.params_cosmo(self.data_type) + '\n\n')
 
             f.write('z_gg     = {}   \n'.format(self.z_mean))
             f.write('z_gm     = {}   \n'.format(self.z_mean))
 
             f.write(lf.R0_params(R0, nR0) + '\n')
-            f.write('use_diag = {}\n\n'.format('F' if 'rebin' in self.bin_type else 'T'))
+            f.write('use_diag = {}\n\n'.format('F' if self.full_cov in self.bin_type else 'T'))
 
             f.write('file_root = ' + self.dir_chains + 'bf_'+ full_name + self.name_root + '\n')
             f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
@@ -353,13 +354,13 @@ if __name__=='__main__':
 
     mocks     = True
        
-    MCMC      = False
-    jack      = True
+    MCMC      = True
+    jack      = False
     chisq     = False
 
     if mocks:
        data_type = 'mocks'
-       bin_type  = 'rebin1'
+       bin_type  = 'logre1'
        redzz     = ['singlesnap'] #,'allsnap', 'evol']
     else:
        data_type = 'lowz'
@@ -372,7 +373,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
             for jk in np.arange(100 if jack else 1):
-                if R0== 2: 
+                if R0== 6: 
                    print R0_points, 'jk=', jk
                    if jack:
                       Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
@@ -380,12 +381,12 @@ if __name__=='__main__':
                       Ini.write_jk(R0, jk)
                       Ini.plot_jk(R0)
                    if MCMC:
-                      Ini.reshape_tables(R0, jk=jk)
+                      #Ini.reshape_tables(R0, jk=jk)
                       Ini.write_ini(R0, nR0, jk=jk)
-                      Ini.write_wq(  R0, jk=jk, run_wq  =True)
-                      Ini.write_dist(R0,        run_dist=True)
-                      Ini.write_bf(  R0,        run_bf  =True)
-                      Ini.plot_bf(   R0)              
+                      #Ini.write_wq(  R0, jk=jk, run_wq  =True)
+                      #Ini.write_dist(R0,        run_dist=True)
+                      #Ini.write_bf(  R0,        run_bf  =True)
+                      #Ini.plot_bf(   R0)              
                    if chisq:   
                       Ini.write_ini(R0, nR0,      threads=1, action=2)
                       Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)

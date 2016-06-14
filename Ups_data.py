@@ -13,23 +13,29 @@ class Info_model:
         self.bin_type  = bin_type
         self.redz      = redz
         self.jackknife = jackknife
+
+	self.sim  = 'sim'
+	self.mocks= 'mocks'
+	self.lowz = 'lowz'
+
         self.nada = 'nothing'
 
 
         #select file's name
     def files_name(self):
-        fname = {'sim'  : self.data_type    + '_' + self.bin_type + '_z' + self.redz + '_norsd_np0.001_nRT10_r0',
-                 'mocks': 'mock_bigMD_RST_' + self.redz + '_' + self.bin_type + '_DM1_r0',
-                 'lowz' : self.redz + '_'   + self.bin_type + '_r0'}
+        fname = {self.sim  : self.data_type    + '_' + self.bin_type + '_z' + self.redz + '_norsd_np0.001_nRT10_r0',
+                 self.mocks: '{}'.format(self.redz) + '_r0',
+		 #'mocks': 'mock_bigMD_RST_' + self.redz + '_' + self.bin_type + '_DM1_r0',
+                 self.lowz : self.redz + '_'   + self.bin_type + '_r0'}
         return fname[self.data_type]
 
 
 
         #select chains's folder
     def chain_dir(self):
-        chdir = {'sim'  : 'Sim',
-                 'mocks': 'Mocks',
-                 'lowz' : 'Lowz'}
+        chdir = {self.sim  : 'Sim',
+                 self.mocks: 'Mocks',
+                 self.lowz : 'Lowz'}
         ch = chdir[self.data_type]
 
         if self.jackknife: ch += '_jk'
@@ -38,9 +44,9 @@ class Info_model:
 
         #select data's folder
     def data_dir(self):
-        ddir = {'sim'  : 'sim_results/',
-                'mocks': 'mock_results/',
-                'lowz' : 'lowz_results/'
+        ddir = {self.sim  : 'sim_results/',
+                self.mocks: 'mock_results/{0:s}/{1:s}/'.format(self.redz, self.bin_type),
+                self.lowz : 'lowz_results/'
                 }
         return ddir[self.data_type]
 
@@ -57,19 +63,19 @@ class Info_model:
         data_type = self.data_type
         bin_type  = self.bin_type
 
-        if 'sim' in data_type:
+        if self.sim in data_type:
             if 'lin_bin1' in bin_type:
                 lnp = 102, 90, 82, 74, 70, 54, 34
             elif 'log_rebin1' in bin_type:
                 lnp = 22, 18, 18, 16, 16, 12, 8
 
-        elif 'mocks' in data_type:
+        elif self.mocks in data_type:
             if 'lin1' in bin_type:
                 lnp  =  134, 132, 130, 128, 126, 118
-            elif 'rebin1' in bin_type:
+            elif 'logre1' in bin_type:
                 lnp = 28, 28, 28, 28, 28, 28
 
-        elif 'lowz' in data_type:
+        elif self.lowz in data_type:
             if 'rebin' in bin_type:
                 lnp =  28, 28, 28, 28, 28, 28
             else:
@@ -81,9 +87,9 @@ class Info_model:
 
         #select redshift
     def z_mean(self):
-        if 'sim' in self.data_type:
+        if self.sim in self.data_type:
             return self.redz
-        elif 'lowz' in self.data_type:
+        elif self.lowz in self.data_type:
             z = {'lowz': '0.27', 'z1': '0.21', 'z2': '0.31'}
             return z[self.redz]
         else:
