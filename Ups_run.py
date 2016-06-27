@@ -373,7 +373,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
             for jk in np.arange(100 if jack else 1):
-                if R0== 6: 
+                if R0== 3: 
                    print R0_points, 'jk=', jk
                    if jack:
                       Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
@@ -381,7 +381,7 @@ if __name__=='__main__':
                       Ini.write_jk(R0, jk)
                       Ini.plot_jk(R0)
                    if MCMC:
-                      #Ini.reshape_tables(R0, jk=jk)
+                      Ini.reshape_tables(R0, jk=jk)
                       Ini.write_ini(R0, nR0, jk=jk)
                       #Ini.write_wq(  R0, jk=jk, run_wq  =True)
                       #Ini.write_dist(R0,        run_dist=True)
