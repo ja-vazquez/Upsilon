@@ -107,9 +107,9 @@ integer, parameter  :: numr= 304  !Stop there
        real chi2, chi2c,zdata, factor
        real  rl, t1 ,t2, rad
 
-       type (CSpline) :: XiSpl, SigmaGG, SigmaGM, SigmaMM, GetGG, GetGM, GetMM
+       type (CSpline) :: XiSpl, SigmaGG, SigmaGM, SigmaMM, GetGG, GetGM, GetMM, GetDS
        integer, parameter :: NR = 150 !// from 100 before
-       real, dimension (NR) :: xirr,xival, xival0,xival2,xivalmm, xilin, xi2lin, thgg, thgm, thmm
+       real, dimension (NR) :: xirr,xival, xival0,xival2,xivalmm, xilin, xi2lin, thgg, thgm, dsr, thmm
        real :: minr, maxr, corrfact, alphacross, gfactgg, gfactgm
        real :: gfactgg0, gfactgm0, s8, ryr, upscalib
        real*8, external :: rombint
@@ -206,7 +206,7 @@ integer, parameter  :: numr= 304  !Stop there
 
         !Check this number, for mocks should be one
        !rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
-       rhobar =  CMB%hola*0.01
+       !rhobar =  CMB%hola*0.01
 
        s8       = Theory%sigma_8
        upscalib = CMB%upscalib
@@ -341,12 +341,16 @@ integer, parameter  :: numr= 304  !Stop there
              xirr(ii) = rad
              thmm(ii) = GetUpsilon(SigmaMM, rad ,D%ggR0)
              thgg(ii) = GetUpsilon(SigmaGG, rad ,D%ggR0)         
-             thgm(ii) = GetUpsilon(SigmaGM, rad ,D%gmR0)
+             !thgm(ii) = GetUpsilon(SigmaGM, rad ,D%gmR0)
+             
+             thgm(ii) = sqrt(thgg(ii)*thmm(ii))
+             dsr(ii)  = thgm(ii) + (D%ggR0/rad)**2*CMB%hola
           end do
 
           call GetMM%init(xirr, thmm)
           call GetGG%init(xirr, thgg)
           call GetGM%init(xirr, thgm)
+          call GetDS%init(xirr, dsr)
 
           factor = 1.0 !rhobar*(1.0+upscalib*D%calibamp)*D%calibcor
 
@@ -355,7 +359,7 @@ integer, parameter  :: numr= 304  !Stop there
              if (D%isgg(ii)) then
                theo(ii)= (GetGG%eval(rad-aver)+GetGG%eval(rad)+GetGG%eval(rad+aver))/3.0
              else
-               theo(ii)= (GetGM%eval(rad-aver)+GetGM%eval(rad)+GetGM%eval(rad+aver))*factor/3.0
+               theo(ii)= (GetDS%eval(rad-aver)+GetDS%eval(rad)+GetDS%eval(rad+aver))*factor/3.0
              end if
           end do
 

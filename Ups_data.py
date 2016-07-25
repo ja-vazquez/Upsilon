@@ -73,7 +73,7 @@ class Info_model:
             if 'lin1' in bin_type:
                 lnp  =  134, 132, 130, 128, 126, 118
             elif 'logre1' in bin_type:
-                lnp = 28, 28, 28, 28, 28, 28
+                lnp = 24, 18, 18, 24, 24, 24
 
         elif self.lowz in data_type:
             if 'rebin' in bin_type:

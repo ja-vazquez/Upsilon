@@ -31,7 +31,7 @@ class Ini_file(Info_model):
         self.name_cov   = '_cov.dat'
         self.name_dist  = 'distparams'
         self.name_gg    = '_upsgg_cov.dat'
-        self.name_gm    = '_upsgm_cov.dat'        
+        self.name_gm    = '_DS_gm_cov_cut.dat'        
         self.name_jk    = '_jk_stats.dat'
 
         self.aver       = 0.0
@@ -40,7 +40,7 @@ class Ini_file(Info_model):
         self.first_line = 1
         self.z_mean     = Info.z_mean()            
 
-	self.full_cov   = 'logre1'                                
+	self.full_cov   = 'log'                                
         self.R0         = Info.R0_files()
         self.npoints    = Info.number_of_points()
         if len(self.R0)!= len(self.npoints):  sys.exit("Error: check number of files")
@@ -63,16 +63,16 @@ class Ini_file(Info_model):
             file_out  += '_jk{0:d}'.format(jk) 
          
          
-            
+	print file_ups + self.name_ups            
         fdata = pd.read_csv(file_ups + self.name_ups,
                             sep='\s+', skiprows=[0], 
-                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err', 'rcc', 'rcc_err'])
+                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err', 'DS_gm', 'DS_gm_err'])
       
         lups = len(fdata)
         fdata_no_ggpoint = fdata[['rp', 'upsgg']][self.first_line:]
-        fdata_no_gmpoint = fdata[['rp', 'upsgm']][self.first_line:]
+        fdata_no_gmpoint = fdata[['rp', 'DS_gm']][self.first_line:]
         pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
-        pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['upsgm']
+        pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['DS_gm']
 	
            
         pd_tmp[['rp', 'all']].to_csv(file_out + self.name_ups,
@@ -373,7 +373,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
             for jk in np.arange(100 if jack else 1):
-                if R0== 3: 
+                if R0== 4: 
                    print R0_points, 'jk=', jk
                    if jack:
                       Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
