@@ -155,8 +155,8 @@ class Ini_file(Info_model):
 
         with open('bf_INI_{0:s}.ini'.format(full_name), 'w') as f:
             f.write('param[LRGa] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(b1_bf, b1_bf-0.001, b1_bf+0.001))
-            f.write('param[LRGb] = {0:1.3f} {0:1.3f} {0:1.3f} 0.001 0.001\n'.format(b2_bf, b2_bf-0.001, b2_bf+0.001))
-            f.write('param[logA] = {0:1.3f} {0:1.3f} {0:1.3f} 0.001 0.001\n'.format(lna_bf,lna_bf-0.001,lna_bf+0.001))
+            f.write('param[LRGb] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(b2_bf, b2_bf-0.001, b2_bf+0.001))
+            f.write('param[logA] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(lna_bf,lna_bf-0.001,lna_bf+0.001))
             f.write('use_upsilon = 99\n')
             f.write('samples     = 8\n')
 
@@ -185,9 +185,10 @@ class Ini_file(Info_model):
         #Plot best-fit model along with data and errorbars
     def plot_bf(self, R0):
         full_name = '{0:s}best_{1:s}{2:d}.dat'.format(self.dir_bf, self.fname, R0)
-	
-        names = ['r', 'obs', 'sig', 'theo']
+        
+	names = ['r', 'obs', 'sig', 'theo', 'mm']
         lines = pd.read_table(full_name, names=names, sep='\s+')
+	print lines
         split_lines = []
         for nm in names:
            split_lines.append(np.array_split(lines[nm], 2))
@@ -205,7 +206,7 @@ class Ini_file(Info_model):
         ax2.errorbar(split_lines[0][1], split_lines[1][1], yerr=list(split_lines[2][1]), fmt='+')
         ax2.plot(split_lines[0][1], split_lines[3][1])
         plt.xlabel('r')
-        plt.ylabel('gm')
+        plt.ylabel('DS(0)')
         ax2.set_title('{0:s}, R0={1:d}'.format(self.redz, R0))
         plt.legend(loc="upper right")
 
@@ -373,7 +374,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
             for jk in np.arange(100 if jack else 1):
-                if R0== 4: 
+                if R0== 2: 
                    print R0_points, 'jk=', jk
                    if jack:
                       Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
@@ -381,12 +382,12 @@ if __name__=='__main__':
                       Ini.write_jk(R0, jk)
                       Ini.plot_jk(R0)
                    if MCMC:
-                      Ini.reshape_tables(R0, jk=jk)
-                      Ini.write_ini(R0, nR0, jk=jk)
+                      #Ini.reshape_tables(R0, jk=jk)
+                      #Ini.write_ini(R0, nR0, jk=jk)
                       #Ini.write_wq(  R0, jk=jk, run_wq  =True)
-                      #Ini.write_dist(R0,        run_dist=True)
-                      #Ini.write_bf(  R0,        run_bf  =True)
-                      #Ini.plot_bf(   R0)              
+                      Ini.write_dist(R0,        run_dist=True)
+                      Ini.write_bf(  R0,        run_bf  =True)
+                      Ini.plot_bf(   R0)              
                    if chisq:   
                       Ini.write_ini(R0, nR0,      threads=1, action=2)
                       Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
