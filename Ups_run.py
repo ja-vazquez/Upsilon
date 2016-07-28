@@ -66,16 +66,16 @@ class Ini_file(Info_model):
 	print file_ups + self.name_ups            
         fdata = pd.read_csv(file_ups + self.name_ups,
                             sep='\s+', skiprows=[0], 
-                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err', 'DS_gm', 'DS_gm_err'])
+                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 
+				     'upsmm', 'upsmm_err', 'DS_gm', 'DS_gm_err', 'rcc', 'rcc_err'])
       
         lups = len(fdata)
-        fdata_no_ggpoint = fdata[['rp', 'upsgg']][self.first_line:]
-        fdata_no_gmpoint = fdata[['rp', 'DS_gm']][self.first_line:]
+        fdata_no_ggpoint = fdata[['rp', 'upsgg', 'rcc']][self.first_line:]
+        fdata_no_gmpoint = fdata[['rp', 'DS_gm', 'rcc']][self.first_line:]
         pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
         pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['DS_gm']
-	
            
-        pd_tmp[['rp', 'all']].to_csv(file_out + self.name_ups,
+        pd_tmp[['rp', 'all', 'rcc']].to_csv(file_out + self.name_ups,
                             header=None, index= None, sep='\t', float_format='%15.7e')
         
             #covariace matrix for gg and gm
@@ -374,7 +374,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
             for jk in np.arange(100 if jack else 1):
-                if R0== 2: 
+                #if R0== 2: 
                    print R0_points, 'jk=', jk
                    if jack:
                       Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
@@ -383,11 +383,11 @@ if __name__=='__main__':
                       Ini.plot_jk(R0)
                    if MCMC:
                       #Ini.reshape_tables(R0, jk=jk)
-                      #Ini.write_ini(R0, nR0, jk=jk)
-                      #Ini.write_wq(  R0, jk=jk, run_wq  =True)
-                      Ini.write_dist(R0,        run_dist=True)
-                      Ini.write_bf(  R0,        run_bf  =True)
-                      Ini.plot_bf(   R0)              
+                      Ini.write_ini( R0, nR0, jk=jk)
+                      Ini.write_wq(  R0, jk=jk, run_wq  =True)
+                      #Ini.write_dist(R0,        run_dist=True)
+                      #Ini.write_bf(  R0,        run_bf  =True)
+                      #Ini.plot_bf(   R0)              
                    if chisq:   
                       Ini.write_ini(R0, nR0,      threads=1, action=2)
                       Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)
