@@ -74,9 +74,10 @@ def params_upsilon():
     txt = """
 param[LRGa]  = 1.8 1 2.5 0.02 0.02
 #param[LRGb] = 0 0 0 0 0
-param[LRGb]  = 0.2 -2.5 2.5 0.01 0.01
+param[LRGb]  = 0. -2.5 2.5 0.01 0.01
 param[logA]  = 3.076 2.6 3.2 0.02 0.02
 #param[logA] = 3.076 3.076 3.076 0 0
+param[hola] =  100 00 300 10 10
 \n\n"""
     return txt
 

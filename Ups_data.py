@@ -54,7 +54,7 @@ class Info_model:
 
         # will read this number from a file later
     def R0_files(self):
-        return 2, 3, 4, 5, 6, 10
+        return 1, 1.5, 2, 3, 4, 5, 6, 10
 
 
 
@@ -73,7 +73,7 @@ class Info_model:
             if 'lin1' in bin_type:
                 lnp  =  134, 132, 130, 128, 126, 118
             elif 'logre1' in bin_type:
-                lnp = 24, 20, 18, 16, 16, 12
+                lnp = 28, 26, 24, 20, 18, 16, 16, 12
 
         elif self.lowz in data_type:
             if 'rebin' in bin_type:
