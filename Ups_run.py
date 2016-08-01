@@ -66,16 +66,16 @@ class Ini_file(Info_model):
 	print file_ups + self.name_ups            
         fdata = pd.read_csv(file_ups + self.name_ups,
                             sep='\s+', skiprows=[0], 
-                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 'upsmm', 'upsmm_err', 'DS_gm', 'DS_gm_err'])
+                            names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 
+				     'upsmm', 'upsmm_err', 'DS_gm', 'DS_gm_err', 'rcc', 'rcc_err'])
       
         lups = len(fdata)
-        fdata_no_ggpoint = fdata[['rp', 'upsgg']][self.first_line:]
-        fdata_no_gmpoint = fdata[['rp', 'DS_gm']][self.first_line:]
+        fdata_no_ggpoint = fdata[['rp', 'upsgg', 'rcc']][self.first_line:]
+        fdata_no_gmpoint = fdata[['rp', 'DS_gm', 'rcc']][self.first_line:]
         pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
         pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['DS_gm']
-	
            
-        pd_tmp[['rp', 'all']].to_csv(file_out + self.name_ups,
+        pd_tmp[['rp', 'all', 'rcc']].to_csv(file_out + self.name_ups,
                             header=None, index= None, sep='\t', float_format='%15.7e')
         
             #covariace matrix for gg and gm
@@ -146,14 +146,21 @@ class Ini_file(Info_model):
         names   = ['param','bestfit','lower1',
                    'upper1','lower2','upper2','name','other']
 
+	best_fit=  pd.read_csv(file_bf,  nrows=1, header=None)
+	title= best_fit.ix[0]
+	log_ind = str(title).split().index('=')
+	self.loglik = (str(title).split()[log_ind+1])[:5]
+
         lines   =  pd.read_csv(file_bf, names= names, sep='\s+', skiprows=[0,1], index_col='name')
         print 'bf', lines
 
+	DS	=  float(lines.ix['DS(0)']['bestfit'])
         b1_bf   =  float(lines.ix['bias_1']['bestfit'])
         b2_bf   =  float(lines.ix['bias_2']['bestfit'])
         lna_bf  =  float(lines.ix['{\\rm{ln}}(10^{10}']['bestfit'])
 
         with open('bf_INI_{0:s}.ini'.format(full_name), 'w') as f:
+ 	    f.write('param[hola] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(DS,    DS- 0.001,   DS+ 0.001))
             f.write('param[LRGa] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(b1_bf, b1_bf-0.001, b1_bf+0.001))
             f.write('param[LRGb] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(b2_bf, b2_bf-0.001, b2_bf+0.001))
             f.write('param[logA] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(lna_bf,lna_bf-0.001,lna_bf+0.001))
@@ -183,12 +190,12 @@ class Ini_file(Info_model):
 
 
         #Plot best-fit model along with data and errorbars
-    def plot_bf(self, R0):
-        full_name = '{0:s}best_{1:s}{2:d}.dat'.format(self.dir_bf, self.fname, R0)
+    def plot_bf(self, R0, nR0):
+        full_name = '{}best_{}{}.dat'.format(self.dir_bf, self.fname, R0)
         
 	names = ['r', 'obs', 'sig', 'theo', 'mm']
         lines = pd.read_table(full_name, names=names, sep='\s+')
-	print lines
+	#print lines
         split_lines = []
         for nm in names:
            split_lines.append(np.array_split(lines[nm], 2))
@@ -199,7 +206,7 @@ class Ini_file(Info_model):
         ax.plot(split_lines[0][0], split_lines[3][0])
         plt.xlabel('r')
         plt.ylabel('gg')
-        ax.set_title('{0:s}, R0={1:d}'.format(self.redz, R0))
+        ax.set_title('{}, R0={}'.format(self.redz, R0))
         plt.legend(loc="upper right")
 
         ax2 = fig.add_subplot(1,2,2)
@@ -207,7 +214,7 @@ class Ini_file(Info_model):
         ax2.plot(split_lines[0][1], split_lines[3][1])
         plt.xlabel('r')
         plt.ylabel('DS(0)')
-        ax2.set_title('{0:s}, R0={1:d}'.format(self.redz, R0))
+#        ax2.set_title("-log(Like) = {}, points= {}".format(self.loglik, nR0))#'{0:s}, R0={1:d}'.format(self.redz, R0))
         plt.legend(loc="upper right")
 
         plt.tight_layout()
@@ -220,7 +227,7 @@ class Ini_file(Info_model):
         #Analyze the chains
     def write_dist(self, R0, run_dist=False):
         txt='file_root=chains/Sim_rmin_gt_R0/Rmin_70_sim_z0.25_norsd_np0.001_nRT10_r02_ups'
-        full_name = '{0:s}{1:d}'.format(self.fname, R0)
+        full_name = '{}{}'.format(self.fname, R0)
         print 'distpars', full_name
 
         txt_new = 'file_root=' + self.dir_chains + full_name + self.name_root
@@ -374,7 +381,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
             for jk in np.arange(100 if jack else 1):
-                if R0== 2: 
+                if R0== 1. or R0==1.5 or R0==2: 
                    print R0_points, 'jk=', jk
                    if jack:
                       Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
@@ -383,11 +390,11 @@ if __name__=='__main__':
                       Ini.plot_jk(R0)
                    if MCMC:
                       #Ini.reshape_tables(R0, jk=jk)
-                      #Ini.write_ini(R0, nR0, jk=jk)
-                      #Ini.write_wq(  R0, jk=jk, run_wq  =True)
-                      Ini.write_dist(R0,        run_dist=True)
-                      Ini.write_bf(  R0,        run_bf  =True)
-                      Ini.plot_bf(   R0)              
+                      #Ini.write_ini( R0, nR0, jk=jk)
+                      #Ini.write_wq(  R0, jk=jk, run_wq  =True, nodes=18, threads=3)
+                      Ini.write_dist(R0,    run_dist=True)
+                      Ini.write_bf(  R0,    run_bf  =True)
+                      Ini.plot_bf(   R0,    nR0)              
                    if chisq:   
                       Ini.write_ini(R0, nR0,      threads=1, action=2)
                       Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)

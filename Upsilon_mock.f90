@@ -42,7 +42,7 @@ type UpsilonData
    real :: ggR0, gmR0, zdatagg, zdatagm, calibamp, calibcor
    integer :: NP
    logical, allocatable, dimension (:) :: isgg
-   real, allocatable, dimension (:) :: rra, dsups
+   real, allocatable, dimension (:) :: rra, dsups, rcc
    real(dl), allocatable, dimension (:,:) :: cov, icov
 
    !! We really use this just to pass parameters around, it changes
@@ -56,7 +56,7 @@ end type UpsilonData
 type(UpsilonData), target :: DLRG, DDEBUG
 type(UpsilonData), pointer :: Dcur
 type(CSpline) :: thc_Fid, thc_ns, thc_s8p, thc_s8m, thc_oml,thc_omh,thc_ah,thc_al, thc_h0l, thc_h0h
-type(CSpline) :: GalPtA, GalPtB
+type(CSpline) :: GalPtA, GalPtB, Galrcc
 type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl_4
 type(CSpline) :: PkSpl, PkASpl, PkBSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
@@ -108,7 +108,7 @@ integer, parameter  :: numr= 304  !Stop there
        real  rl, t1 ,t2, rad
 
        type (CSpline) :: XiSpl, SigmaGG, SigmaGM, SigmaMM, GetGG, GetGM, GetMM, GetDS
-       integer, parameter :: NR = 150 !// from 100 before
+       integer, parameter :: NR = 120 !// from 100 before
        real, dimension (NR) :: xirr,xival, xival0,xival2,xivalmm, xilin, xi2lin, thgg, thgm, dsr, thmm
        real :: minr, maxr, corrfact, alphacross, gfactgg, gfactgm
        real :: gfactgg0, gfactgm0, s8, ryr, upscalib
@@ -172,7 +172,7 @@ integer, parameter  :: numr= 304  !Stop there
        call PkkSpl%init(k_lin, pk_lin)
 
        minr = 1.  
-       maxr = 150 
+       maxr = 120 
         
         ! Linear Xi theory
        do ii = 1, NR
@@ -302,7 +302,7 @@ integer, parameter  :: numr= 304  !Stop there
  
 
           minr = 1.  
-          maxr = 150.
+          maxr = 120.
 
           do ii=1,NR
              rad      = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
@@ -343,8 +343,9 @@ integer, parameter  :: numr= 304  !Stop there
              thgg(ii) = GetUpsilon(SigmaGG, rad ,D%ggR0)         
              !thgm(ii) = GetUpsilon(SigmaGM, rad ,D%gmR0)
              
-             thgm(ii) = sqrt(thgg(ii)*thmm(ii))
+             thgm(ii) = sqrt(thgg(ii)*thmm(ii))/Galrcc%eval(rad)
              dsr(ii)  = thgm(ii) + (D%ggR0/rad)**2*CMB%hola
+             !print *, Galrcc%eval(rad), rad
           end do
 
           call GetMM%init(xirr, thmm)
@@ -488,7 +489,7 @@ integer, parameter  :: numr= 304  !Stop there
 
        print *,"Loading:", TRIM(fnamedat),',', TRIM(fnamecov)
        print *, 'Using only diagonal', ZeroOffDiag
-       allocate (D%isgg(NP), D%rra(NP), D%dsups(NP), D%cov(NP,NP), D%icov(NP,NP))
+       allocate (D%isgg(NP), D%rra(NP), D%dsups(NP), D%rcc(NP), D%cov(NP,NP), D%icov(NP,NP))
        D%ggr0 = ggr0
        D%gmr0 = gmr0
        D%np = np
@@ -500,7 +501,7 @@ integer, parameter  :: numr= 304  !Stop there
          !! first open data gg data
        open (50, file =fnamedat, status='old')
           do ii=1,NP
-             read (50,*) D%rra(ii), D%dsups(ii)
+             read (50,*) D%rra(ii), D%dsups(ii), D%rcc(ii)
           end do
        close(50)
 
@@ -519,6 +520,8 @@ integer, parameter  :: numr= 304  !Stop there
           end do
        end if
 
+
+       call Galrcc%init(D%rra, D%rcc)
 
        D%isgg(1:NPGG) = .true.
        D%isgg(NPGG+1:NP) = .false.
