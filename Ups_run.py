@@ -1,6 +1,7 @@
 
 import os, sys, time
 from Ups_data import Info_model
+from scipy.optimize import curve_fit
 import Ups_latex as lf
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -18,20 +19,24 @@ class Ini_file(Info_model):
         self.jackknife  = jack
         self.fname      = Info.files_name()
 
-
+	self.real_data  = True
         self.data_dir   = Info.data_dir()        
         self.dir_in     = 'data_upsilon/' + self.data_dir
         self.dir_data   = 'lrgdata-final/mocks_lrg/sim_reshaped/'
         self.dir_stats  = 'stats/'
         self.dir_bf     = 'bestfit/'
         self.dir_chains = 'chains/' + Info.chain_dir()
-        
-        self.name_root  = '_ups'
-        self.name_ups   = '_ups.dat'
+
+	#in
+	self.name_ups   = '_ups.dat'
+	self.name_gg    = '_upsgg_cov.dat'
+	self.name_gm    = '_DS_gm_cov_cut.dat'	
+
+	#out        
+	self.name_root  = '_ups' if not self.real_data else '_ups_real'
+	
         self.name_cov   = '_cov.dat'
         self.name_dist  = 'distparams'
-        self.name_gg    = '_upsgg_cov.dat'
-        self.name_gm    = '_DS_gm_cov_cut.dat'        
         self.name_jk    = '_jk_stats.dat'
 
         self.aver       = 0.0
@@ -51,7 +56,13 @@ class Ini_file(Info_model):
         #Info_model.__init__(self, data_type, bin_type, redz)
         #print self.nada
 
+    def function(self, x, a, b, c):
+        return 1.+ a/(x**2+b)
 
+    def fit_curve(self, df):
+	popt, pcov = curve_fit(self.function, df.index.values, df['rcc'].values)
+        yfit = self.function(df.index.values, *popt)
+        return yfit
 
         #reshape the files provided by Sukhdeep, in order to feed them to CosmoMC
     def reshape_tables(self, R0, jk=0):
@@ -63,25 +74,34 @@ class Ini_file(Info_model):
             file_out  += '_jk{0:d}'.format(jk) 
          
          
-	print file_ups + self.name_ups            
+	print file_ups + self.name_ups 
         fdata = pd.read_csv(file_ups + self.name_ups,
                             sep='\s+', skiprows=[0], 
                             names = ['rp', 'upsgg', 'upsgg_err', 'upsgm', 'upsgm_err', 
-				     'upsmm', 'upsmm_err', 'DS_gm', 'DS_gm_err', 'rcc', 'rcc_err'])
+				     'upsmm', 'upsmm_err', 'DS_gm', 'DS_gm_err', 'rcc', 'rcc_err', 'rsd_correct'])
       
         lups = len(fdata)
-        fdata_no_ggpoint = fdata[['rp', 'upsgg', 'rcc']][self.first_line:]
-        fdata_no_gmpoint = fdata[['rp', 'DS_gm', 'rcc']][self.first_line:]
-        pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
-        pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['DS_gm']
-           
-        pd_tmp[['rp', 'all', 'rcc']].to_csv(file_out + self.name_ups,
+        fdata_no_ggpoint = fdata[['rp', 'upsgg', 'rcc', 'rcc_err', 'rsd_correct']][self.first_line:]
+        fdata_no_gmpoint = fdata[['rp', 'DS_gm', 'rcc', 'rcc_err', 'rsd_correct']][self.first_line:]
+	fdata_no_ggpoint['rcc_fit'] = self.fit_curve(fdata_no_ggpoint)
+	fdata_no_gmpoint['rcc_fit'] = self.fit_curve(fdata_no_gmpoint)
+       
+	pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
+        
+	#adding correction for QPS mocks
+	pd_tmp['all'] = pd_tmp['upsgg']/pd_tmp['rsd_correct']  + pd_tmp['DS_gm']
+        pd_tmp[['rp', 'all', 'rcc_fit']].to_csv(file_out + self.name_root + '.dat',
                             header=None, index= None, sep='\t', float_format='%15.7e')
         
-            #covariace matrix for gg and gm
+        #covariace matrix for gg and gm
         table1 = np.loadtxt(file_in + self.name_gg)
+
+	#to use real data for a test, will change it back later	
+	if self.real_data:
+	   file_in = 'data_upsilon/mock_results/lowz_cov/qpm200_r0' + str(R0) 	
+
         table2 = np.loadtxt(file_in + self.name_gm)
-        
+         
         new_table1 = table1[self.first_line: lups, self.first_line: lups]
         new_table2 = table2[self.first_line: lups, self.first_line: lups]    
     
@@ -89,7 +109,7 @@ class Ini_file(Info_model):
         zero= '0 '*row
         
             # we leave it in this way for now
-        with open(file_out + self.name_cov, 'w') as f:
+        with open(file_out + self.name_root + self.name_cov, 'w') as f:
             for n in range(row):
                 for m in range(col):
                     f.write(str("%1.3e" %float(new_table1[n,m])) + ' ')
@@ -109,7 +129,7 @@ class Ini_file(Info_model):
         
         #Write .INI files 
     def write_ini(self, R0, nR0, jk=0, threads=3, action=0):
-        full_name = self.fname + str(R0)        
+        full_name = self.fname + str(R0) + self.name_root        
         if self.jackknife: 
             full_name += '_jk{0:d}'.format(jk)
             
@@ -131,8 +151,8 @@ class Ini_file(Info_model):
             f.write(lf.R0_params(R0, nR0) + '\n')
             f.write('use_diag = {0:s}\n\n'.format('F' if self.full_cov in self.bin_type else 'T'))
 
-            f.write('file_root = ' + self.dir_chains + full_name + self.name_root + '\n')
-            f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
+            f.write('file_root = ' + self.dir_chains + full_name + '\n')
+            f.write('mock_file = ' + self.dir_data   + full_name + '.dat'  + '\n')
             f.write('mock_cov  = ' + self.dir_data   + full_name + self.name_cov  + '\n')
 	
             time.sleep(2.)
@@ -140,24 +160,24 @@ class Ini_file(Info_model):
 
         #Once we have the MCchains, get best-fit values
     def write_bf(self, R0, run_bf=False):
-        full_name = self.fname + str(R0)
-        file_bf = self.dir_stats + full_name + self.name_root + '.likestats'
+        full_name = self.fname + str(R0) + self.name_root
+        file_bf = self.dir_stats + full_name + '.margestats'
         
-        names   = ['param','bestfit','lower1',
-                   'upper1','lower2','upper2','name','other']
+        names   = ['param','mean','sddev','lower1',
+                   'upper1','limit1','lower2','upper2','limit2','other']
 
-	best_fit=  pd.read_csv(file_bf,  nrows=1, header=None)
-	title= best_fit.ix[0]
-	log_ind = str(title).split().index('=')
-	self.loglik = (str(title).split()[log_ind+1])[:5]
+	#best_fit=  pd.read_csv(file_bf,  nrows=1, header=None)
+	#title= best_fit.ix[0]
+	#log_ind = str(title).split().index('=')
+	#self.loglik = (str(title).split()[log_ind+1])[:5]
 
-        lines   =  pd.read_csv(file_bf, names= names, sep='\s+', skiprows=[0,1], index_col='name')
+        lines   =  pd.read_csv(file_bf, names= names, sep='\s+', skiprows=[0,1,2], index_col='param')
         print 'bf', lines
 
-	DS	=  float(lines.ix['DS(0)']['bestfit'])
-        b1_bf   =  float(lines.ix['bias_1']['bestfit'])
-        b2_bf   =  float(lines.ix['bias_2']['bestfit'])
-        lna_bf  =  float(lines.ix['{\\rm{ln}}(10^{10}']['bestfit'])
+	DS	=  float(lines.ix['hola']['mean'])
+        b1_bf   =  float(lines.ix['LRGa']['mean'])
+        b2_bf   =  float(lines.ix['LRGb']['mean'])
+        lna_bf  =  float(lines.ix['logA']['mean'])
 
         with open('bf_INI_{0:s}.ini'.format(full_name), 'w') as f:
  	    f.write('param[hola] = {0:2.3f} {1:2.3f} {2:2.3f} 0.001 0.001\n'.format(DS,    DS- 0.001,   DS+ 0.001))
@@ -178,8 +198,8 @@ class Ini_file(Info_model):
             f.write(lf.R0_params(R0, nR0) + '\n')
             f.write('use_diag = {}\n\n'.format('F' if self.full_cov in self.bin_type else 'T'))
 
-            f.write('file_root = ' + self.dir_chains + 'bf_'+ full_name + self.name_root + '\n')
-            f.write('mock_file = ' + self.dir_data   + full_name + self.name_ups  + '\n')
+            f.write('file_root = ' + self.dir_chains + 'bf_'+ full_name + '\n')
+            f.write('mock_file = ' + self.dir_data   + full_name + '.dat'  + '\n')
             f.write('mock_cov  = ' + self.dir_data   + full_name + self.name_cov  + '\n')
 
         if run_bf:
@@ -191,7 +211,8 @@ class Ini_file(Info_model):
 
         #Plot best-fit model along with data and errorbars
     def plot_bf(self, R0, nR0):
-        full_name = '{}best_{}{}.dat'.format(self.dir_bf, self.fname, R0)
+	full_name = self.fname + str(R0) + self.name_root
+        full_name = '{}best_{}.dat'.format(self.dir_bf, full_name)
         
 	names = ['r', 'obs', 'sig', 'theo', 'mm']
         lines = pd.read_table(full_name, names=names, sep='\s+')
@@ -227,10 +248,10 @@ class Ini_file(Info_model):
         #Analyze the chains
     def write_dist(self, R0, run_dist=False):
         txt='file_root=chains/Sim_rmin_gt_R0/Rmin_70_sim_z0.25_norsd_np0.001_nRT10_r02_ups'
-        full_name = '{}{}'.format(self.fname, R0)
+        full_name = self.fname + str(R0) + self.name_root
         print 'distpars', full_name
 
-        txt_new = 'file_root=' + self.dir_chains + full_name + self.name_root
+        txt_new = 'file_root=' + self.dir_chains + full_name
         f1 = open(self.name_dist + '.ini', 'r')
         f2 = open(self.name_dist + '_{}.ini'.format(full_name), 'w')
 
@@ -249,7 +270,7 @@ class Ini_file(Info_model):
 
         #Write a bunch of files that will run everything in the BNL cluster
     def write_wq(self, R0, jk=0, run_wq=False, nodes=12, threads=3):
-        full_name = self.fname + str(R0)        
+        full_name = self.fname + str(R0) + self.name_root
         if self.jackknife: 
             full_name += '_jk{0:d}'.format(jk)
         print 'wq', full_name
@@ -274,8 +295,8 @@ class Ini_file(Info_model):
 
         #Collect chisq from all the models
     def write_chisq(self, R0):
-        full_name = '{0:s}{1:d}'.format(self.fname, R0)
-        file_chisq = self.dir_chains + full_name + self.name_root + '.minimum'
+        full_name = self.fname + str(R0) + self.name_root
+        file_chisq = self.dir_chains + full_name + '.minimum'
 
         with open(file_chisq, 'rb') as f:
             for line in f:
@@ -290,7 +311,7 @@ class Ini_file(Info_model):
 
         #Collect info from the 100 jacknives
     def write_jk(self, R0, jk):
-        full_name = self.fname + str(R0) + '_jk{0:d}'.format(jk)  + '_ups.minimum' 
+        full_name = self.fname + str(R0) + self.name_root + '_jk{0:d}'.format(jk)  + '_ups.minimum' 
         read_jk = pd.read_csv(self.dir_chains + full_name,
                                 names = ['npar', 'value', 'name', 'latex', 'other'],
                                 skiprows=[0,1,2], sep='\s+', index_col=['name'])
@@ -381,7 +402,7 @@ if __name__=='__main__':
         for R0_points in Ini.R0_points:
             R0, nR0 = R0_points 
             for jk in np.arange(100 if jack else 1):
-                if R0== 1. or R0==1.5 or R0==2: 
+                if R0== 2.0: # or R0==2: # or R0==2: 
                    print R0_points, 'jk=', jk
                    if jack:
                       Ini.write_ini(R0, nR0, jk=jk,      threads=1, action=2)
@@ -389,12 +410,12 @@ if __name__=='__main__':
                       Ini.write_jk(R0, jk)
                       Ini.plot_jk(R0)
                    if MCMC:
-                      #Ini.reshape_tables(R0, jk=jk)
-                      #Ini.write_ini( R0, nR0, jk=jk)
-                      #Ini.write_wq(  R0, jk=jk, run_wq  =True, nodes=18, threads=3)
-                      Ini.write_dist(R0,    run_dist=True)
-                      Ini.write_bf(  R0,    run_bf  =True)
-                      Ini.plot_bf(   R0,    nR0)              
+                      Ini.reshape_tables(R0, jk=jk)
+                      Ini.write_ini( R0, nR0, jk=jk)
+                      Ini.write_wq(  R0, jk=jk, run_wq  =True, nodes=15, threads=3)
+                      #Ini.write_dist(R0,    run_dist=True)
+                      #Ini.write_bf(  R0,    run_bf  =True)
+                      #Ini.plot_bf(   R0,    nR0)              
                    if chisq:   
                       Ini.write_ini(R0, nR0,      threads=1, action=2)
                       Ini.write_wq(R0, run_wq=True, nodes=1, threads=1)

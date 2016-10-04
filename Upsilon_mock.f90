@@ -61,7 +61,7 @@ type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl
 type(CSpline) :: PkSpl, PkASpl, PkBSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
                                 
-real, parameter :: zdatafid = 0.23, maxrgg=100.0, maxrgm=100.0 ! 150, 150,zfid=0.23
+real, parameter :: zdatafid = 0.23, maxrgg= 70.0, maxrgm=70.0 ! 100, 100,zfid=0.23
 !be the actual redshift of simulations. 
 real, parameter :: finalcor =0.00
 integer, parameter :: MAXNP=200
@@ -108,7 +108,7 @@ integer, parameter  :: numr= 304  !Stop there
        real  rl, t1 ,t2, rad
 
        type (CSpline) :: XiSpl, SigmaGG, SigmaGM, SigmaMM, GetGG, GetGM, GetMM, GetDS
-       integer, parameter :: NR = 120 !// from 100 before
+       integer, parameter :: NR = 150 !// from 100 before
        real, dimension (NR) :: xirr,xival, xival0,xival2,xivalmm, xilin, xi2lin, thgg, thgm, dsr, thmm
        real :: minr, maxr, corrfact, alphacross, gfactgg, gfactgm
        real :: gfactgg0, gfactgm0, s8, ryr, upscalib
@@ -171,8 +171,8 @@ integer, parameter  :: numr= 304  !Stop there
 
        call PkkSpl%init(k_lin, pk_lin)
 
-       minr = 1.  
-       maxr = 120 
+       minr = 1.6
+       maxr = 80. 
         
         ! Linear Xi theory
        do ii = 1, NR
@@ -301,8 +301,8 @@ integer, parameter  :: numr= 304  !Stop there
           end if
  
 
-          minr = 1.  
-          maxr = 120.
+          minr = 1.6
+          maxr = 80.
 
           do ii=1,NR
              rad      = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
@@ -521,7 +521,7 @@ integer, parameter  :: numr= 304  !Stop there
        end if
 
 
-       call Galrcc%init(D%rra, D%rcc)
+       call Galrcc%init(D%rra(1:NPGG), D%rcc(1:NPGG))
 
        D%isgg(1:NPGG) = .true.
        D%isgg(NPGG+1:NP) = .false.

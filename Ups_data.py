@@ -25,7 +25,6 @@ class Info_model:
     def files_name(self):
         fname = {self.sim  : self.data_type    + '_' + self.bin_type + '_z' + self.redz + '_norsd_np0.001_nRT10_r0',
                  self.mocks: '{}'.format(self.redz) + '_r0',
-		 #'mocks': 'mock_bigMD_RST_' + self.redz + '_' + self.bin_type + '_DM1_r0',
                  self.lowz : self.redz + '_'   + self.bin_type + '_r0'}
         return fname[self.data_type]
 
