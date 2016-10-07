@@ -343,8 +343,8 @@ integer, parameter  :: numr= 304  !Stop there
              thgg(ii) = GetUpsilon(SigmaGG, rad ,D%ggR0)         
              !thgm(ii) = GetUpsilon(SigmaGM, rad ,D%gmR0)
              
-             thgm(ii) = sqrt(thgg(ii)*thmm(ii))/Galrcc%eval(rad)
-             dsr(ii)  = thgm(ii) + (D%ggR0/rad)**2*CMB%hola
+             thgm(ii) = sqrt(thgg(ii)*thmm(ii))
+             dsr(ii)  = (thgm(ii) + (D%ggR0/rad)**2*CMB%hola)* Galrcc%eval(rad)
              !print *, Galrcc%eval(rad), rad
           end do
 
