@@ -89,8 +89,8 @@ class Ini_file(Info_model):
 	pd_tmp = pd.concat([fdata_no_ggpoint, fdata_no_gmpoint]).fillna(0) 
         
 	#adding correction for QPS mocks
-	pd_tmp['all'] = pd_tmp['upsgg']/pd_tmp['rsd_correct']  + pd_tmp['DS_gm']
-        pd_tmp[['rp', 'all', 'rcc_fit']].to_csv(file_out + self.name_root + '.dat',
+	pd_tmp['all'] = pd_tmp['upsgg'] + pd_tmp['DS_gm']
+        pd_tmp[['rp', 'all', 'rcc_fit', 'rsd_correct']].to_csv(file_out + self.name_root + '.dat',
                             header=None, index= None, sep='\t', float_format='%15.7e')
         
         #covariace matrix for gg and gm

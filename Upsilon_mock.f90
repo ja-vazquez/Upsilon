@@ -42,7 +42,7 @@ type UpsilonData
    real :: ggR0, gmR0, zdatagg, zdatagm, calibamp, calibcor
    integer :: NP
    logical, allocatable, dimension (:) :: isgg
-   real, allocatable, dimension (:) :: rra, dsups, rcc
+   real, allocatable, dimension (:) :: rra, dsups, rcc, rsd
    real(dl), allocatable, dimension (:,:) :: cov, icov
 
    !! We really use this just to pass parameters around, it changes
@@ -56,7 +56,7 @@ end type UpsilonData
 type(UpsilonData), target :: DLRG, DDEBUG
 type(UpsilonData), pointer :: Dcur
 type(CSpline) :: thc_Fid, thc_ns, thc_s8p, thc_s8m, thc_oml,thc_omh,thc_ah,thc_al, thc_h0l, thc_h0h
-type(CSpline) :: GalPtA, GalPtB, Galrcc
+type(CSpline) :: GalPtA, GalPtB, Galrcc, Galrsd
 type(CSpline) :: CoyoSpl, FFTSpl, FFTSpl_0, FFTSpl_1, FFTSpl_2, FFTSpl_3, FFTSpl_4
 type(CSpline) :: PkSpl, PkASpl, PkBSpl, PkkSpl, XilinSpl, Xi_ASpl, Xi_BSpl 
 
@@ -205,7 +205,7 @@ integer, parameter  :: numr= 304  !Stop there
        !-----------
 
         !Check this number, for mocks should be one
-       !rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
+       rhobar =  2.77519737e11*(CMB%omdm+CMB%omb+0.0*CMB%omnu)*1e-12
        !rhobar =  CMB%hola*0.01
 
        s8       = Theory%sigma_8
@@ -340,7 +340,7 @@ integer, parameter  :: numr= 304  !Stop there
              rad = minr * (maxr/minr)**(DBLE((ii-1))/DBLE((NR-1)))
              xirr(ii) = rad
              thmm(ii) = GetUpsilon(SigmaMM, rad ,D%ggR0)
-             thgg(ii) = GetUpsilon(SigmaGG, rad ,D%ggR0)         
+             thgg(ii) = GetUpsilon(SigmaGG, rad ,D%ggR0)*Galrsd%eval(rad)         
              !thgm(ii) = GetUpsilon(SigmaGM, rad ,D%gmR0)
              
              thgm(ii) = sqrt(thgg(ii)*thmm(ii))
@@ -353,7 +353,7 @@ integer, parameter  :: numr= 304  !Stop there
           call GetGM%init(xirr, thgm)
           call GetDS%init(xirr, dsr)
 
-          factor = 1.0 !rhobar*(1.0+upscalib*D%calibamp)*D%calibcor
+          factor = rhobar*(1.0+upscalib*D%calibamp)*D%calibcor
 
           do ii=1,D%NP
              rad = D%rra(ii)
@@ -382,6 +382,10 @@ integer, parameter  :: numr= 304  !Stop there
             end if
 
           diff(1:D%NP) = theo(1:D%NP) - D%dsups
+          
+          !when using real data
+          D%icov = D%icov*factor**2
+         
           chx2 = DOT_PRODUCT(diff(1:D%NP),MATMUL(D%icov,diff(1:D%NP)))
        end function GetDataChi2
 
@@ -489,7 +493,7 @@ integer, parameter  :: numr= 304  !Stop there
 
        print *,"Loading:", TRIM(fnamedat),',', TRIM(fnamecov)
        print *, 'Using only diagonal', ZeroOffDiag
-       allocate (D%isgg(NP), D%rra(NP), D%dsups(NP), D%rcc(NP), D%cov(NP,NP), D%icov(NP,NP))
+       allocate (D%isgg(NP), D%rra(NP), D%dsups(NP), D%rcc(NP), D%rsd(NP), D%cov(NP,NP), D%icov(NP,NP))
        D%ggr0 = ggr0
        D%gmr0 = gmr0
        D%np = np
@@ -501,7 +505,7 @@ integer, parameter  :: numr= 304  !Stop there
          !! first open data gg data
        open (50, file =fnamedat, status='old')
           do ii=1,NP
-             read (50,*) D%rra(ii), D%dsups(ii), D%rcc(ii)
+             read (50,*) D%rra(ii), D%dsups(ii), D%rcc(ii), D%rsd(ii)
           end do
        close(50)
 
@@ -522,6 +526,7 @@ integer, parameter  :: numr= 304  !Stop there
 
 
        call Galrcc%init(D%rra(1:NPGG), D%rcc(1:NPGG))
+       call Galrsd%init(D%rra(1:NPGG), D%rsd(1:NPGG))
 
        D%isgg(1:NPGG) = .true.
        D%isgg(NPGG+1:NP) = .false.
